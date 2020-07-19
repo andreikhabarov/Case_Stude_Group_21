@@ -1,5 +1,8 @@
 ---
 title: "Case_Study_Group_21"
+group: "Gruppe 21"
+author: "Andrei Khabarov, Hikmat Shahi, Dimitri Zubitashvili, Dmytro Davydenko"
+date: "12/07/2020" 
 output: html_document
 ---
 
@@ -7,22 +10,224 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Aufgabestellung
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Wir sind die Mitarbeiter in der Abteilung "Total Vehicle Quality" eines Automobilkonzerns, der Fahrzeugtypen "OEM1" und "OEM2" herstellt. Die Lieferkette besteht aus Teilelieferanten und Komponentenlieferanten. Das Produktionswerk installiert die Komponenten in den Fahrzeugen. Unsere Aufgabe ist, festzustellen, welches OEM-Werk sich im Laufe der Jahre 2013-2015 am besten verbessert hat (durch Vergleichen der Fehleranteile zwischen den Produktionsjahren). Fahrzeuge sollten als defekt angesehen werden, wenn ein Fehler auf Teile-, Komponenten- und / oder Fahrzeugebene auftritt. Wenn Fehler auf mehreren auftreten Ebenen wird nur der zuerst aufgetretene Fehler berücksichtigt
 
-```{r cars}
-summary(cars)
+## Import Biblioteken
+```{r}
+
+if(!require(tidyverse)){
+  install.package("tidyverse")
+  library(tidyverse)
+}
+
+if(!require(stringr)){
+  install.package("stringr")
+  library(stringr)
+}
+
+if(!require(readr)){
+  install.package("readr")
+  library(readr)
+}
 ```
 
-## Including Plots
+## Linlek zu Datein einsetzen
+```{r}
+Einzelteil <- list.files(path = "Data/Einzelteil")
+Einzelteil_path <- file.path(path = "Data/Einzelteil", Einzelteil)
 
-You can also embed plots, for example:
+Komponente <- list.files(path = "Data/Komponente")
+Komponente_path <- file.path(path = "Data/Komponente", Komponente)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+Fahrzeug <- list.files(path = "Data/Fahrzeug")
+Fahrzeug_path <- file.path(path = "Data/Fahrzeug", Fahrzeug)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Fahrzeugen import
+```{r}
+Fahrzeuge_1 <- read_csv(Fahrzeug_path[5], col_names = TRUE, col_types = cols())
+Fahrzeuge_2 <- read_csv2(Fahrzeug_path[6], col_names = TRUE, col_types = cols())
+Fahrzeuge_3 <- read_csv(Fahrzeug_path[7], col_names = TRUE, col_types = cols())
+Fahrzeuge_4 <- read_csv2(Fahrzeug_path[8], col_names = TRUE, col_types = cols())
+```
+
+## Bestend Komponente import
+```{r}
+Bestend_Kompanente_01 <- read_csv2(Komponente_path[1], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_02 <- read_csv2(Komponente_path[2], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_03 <- read_csv2(Komponente_path[3], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_04 <- read_csv2(Komponente_path[4], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_05 <- read_csv2(Komponente_path[5], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_06 <- read_csv2(Komponente_path[6], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_07 <- read_csv2(Komponente_path[7], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_08 <- read_csv2(Komponente_path[8], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_09 <- read_csv2(Komponente_path[9], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_10 <- read_csv2(Komponente_path[10], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_11 <- read_csv2(Komponente_path[11], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_12 <- read_csv2(Komponente_path[12], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_13 <- read_csv2(Komponente_path[13], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_14 <- read_csv2(Komponente_path[14], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_15 <- read_csv2(Komponente_path[15], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_16 <- read_csv2(Komponente_path[16], col_names = TRUE, col_types = cols())
+```
+
+
+## Komponente import
+```{r}
+Kompanente_01 <- read_csv(Komponente_path[17], col_names = TRUE, col_types = cols())
+Kompanente_02 <- read_csv2(Komponente_path[18], col_names = TRUE, col_types = cols())
+Kompanente_03 <- read_csv(Komponente_path[19], col_names = TRUE, col_types = cols())
+#Kompanente_04 <- read_csv2(Komponente_path[20], col_names = TRUE, col_types = cols())
+k20<-read_file(Komponente_path[20])
+k20<-gsub("\t","\n",k20)
+k20<-gsub("\\","\t",k20, fixed=TRUE) 
+Kompanente_04<-read_tsv(k20, skip=1)
+#Kompanente_05 <- read_csv2(Komponente_path[21], col_names = TRUE, col_types = cols())
+k21 <- read_file(Komponente_path[21])
+k21 <- gsub("", "\n", k21)
+k21 <- gsub("II","\t", k21, fixed = T)
+Kompanente_05 <- read_tsv(k21, skip=1)
+Kompanente_06 <- read.table(Komponente_path[22], header = T, sep =  "\\", stringsAsFactors = F)
+Kompanente_07 <- read.table(Komponente_path[23], header = T, sep =  "|", stringsAsFactors = F)
+Kompanente_08 <- read_csv2(Komponente_path[24], col_names = TRUE, col_types = cols())
+Kompanente_09 <- read_csv(Komponente_path[25], col_names = TRUE, col_types = cols())
+Kompanente_10 <- read.table(Komponente_path[26], header = T, sep =  "\\", stringsAsFactors = F)
+Kompanente_11 <- read_csv(Komponente_path[27], col_names = TRUE, col_types = cols())
+Kompanente_12 <- read_csv(Komponente_path[28], col_names = TRUE, col_types = cols())
+Kompanente_13 <- read_csv2(Komponente_path[29], col_names = TRUE, col_types = cols())
+Kompanente_14 <- read_csv(Komponente_path[30], col_names = TRUE, col_types = cols())
+Kompanente_15 <- read_csv2(Komponente_path[31], col_names = TRUE, col_types = cols())
+Kompanente_16 <- read.table(Komponente_path[32], header = T, sep =  "\t", stringsAsFactors = F)
+```
+
+## Einzelteile herunterladen (ohne 22, 35)
+
+Die Einzelteil-Dateien werden geladen
+```{r}
+
+Einzelteil_05 <- read.csv(Einzelteil_path[5])
+Einzelteil_06 <- read.csv(Einzelteil_path[6])
+Einzelteil_08 <- read.csv(Einzelteil_path[8])
+Einzelteil_19 <- read.csv(Einzelteil_path[19])
+Einzelteil_25 <- read.csv(Einzelteil_path[25])
+Einzelteil_30 <- read.csv("Data/Einzelteil/Einzelteil_T30.csv")
+Einzelteil_33 <- read.csv("Data/Einzelteil/Einzelteil_T33.csv")
+Einzelteil_37 <- read.csv("Data/Einzelteil/Einzelteil_T37.csv")
+Einzelteil_38 <- read.csv("Data/Einzelteil/Einzelteil_T38.csv")
+
+Einzelteil_04 <- read.csv2(Einzelteil_path[4])
+Einzelteil_10 <- read.csv2(Einzelteil_path[10])
+Einzelteil_12 <- read.csv2(Einzelteil_path[12])
+Einzelteil_13 <- read.csv2(Einzelteil_path[13])
+Einzelteil_14 <- read.csv2(Einzelteil_path[14])
+Einzelteil_18 <- read.csv2(Einzelteil_path[18])
+Einzelteil_21 <- read.csv2(Einzelteil_path[21])
+Einzelteil_23 <- read.csv2(Einzelteil_path[23])
+Einzelteil_26 <- read.csv2(Einzelteil_path[26])
+Einzelteil_32 <- read.csv2("Data/Einzelteil/Einzelteil_T32.csv")
+Einzelteil_40 <- read.csv2("Data/Einzelteil/Einzelteil_T40.csv")
+
+
+
+
+ET_01 <- read_file(Einzelteil_path[1]) #die Datei als Vektor lesen
+ET_01 <- gsub(' | | ','\t', ET_01, fixed = T) #TAB als Trennzeichen
+ET_01 <- gsub(' ', '\n', ET_01) #Zeilenende definieren
+Einzelteil_01 <- read_tsv(ET_01) #Erstellung des Data-Frames
+
+ET_02 <- read_file(Einzelteil_path[2]) #die Datei als Vektor lesen
+ET_02 <- gsub('\t', '\n', ET_02) #Zeilenende definieren
+ET_02 <- gsub('  ','\t', ET_02, fixed = T) #TAB als Trennzeichen
+Einzelteil_02 <- read_tsv(ET_02) #Erstellung des Data-Frames
+
+ET_03 <- read_file(Einzelteil_path[3])
+ET_03 <- gsub('', '\n', ET_03)
+ET_03 <- gsub('|', '\t', ET_03, fixed = T)
+Einzelteil_03 <- read_tsv(ET_03)
+
+ET_07 <- read_file(Einzelteil_path[7])
+ET_07 <- gsub('""', '"\n"', ET_07)
+Einzelteil_07 <- read_tsv(ET_07)
+
+ET_09 <- read_file(Einzelteil_path[9])
+ET_09 <- gsub("\\", "\t", ET_09, fixed = T)
+ET_09 <- gsub("", "\n", ET_09)
+Einzelteil_08 <- read_tsv(ET_09)
+
+ET_11 <- read_file(Einzelteil_path[11])
+ET_11 <- gsub('', '\n', ET_11)
+Einzelteil_11 <- read_tsv(ET_11)
+
+ET_16 <- read_file(Einzelteil_path[16])
+ET_16 <- gsub('\t', '\n', ET_16)
+ET_16 <- gsub(' | | ', '\t', ET_16, fixed = T)
+Einzelteil_16 <- read_tsv(ET_16)
+
+ET_20 <- read_file(Einzelteil_path[20])
+ET_20 <- gsub(' | | ', '\t', ET_20, fixed = T)
+ET_20 <- gsub(' ', '\n', ET_20)
+Einzelteil_20 <- read_tsv(ET_20)
+
+ET_24 <- read_file(Einzelteil_path[24])
+ET_24 <- gsub('', '\n', ET_24)
+ET_24 <- gsub('  ', '\t', ET_24, fixed = T)
+Einzelteil_24 <- read_tsv(ET_24)
+
+ET_27 <- read_file(Einzelteil_path[27])
+ET_27 <- gsub('', '\n', ET_27)
+ET_27 <- gsub(' | | ', '\t', ET_27, fixed = T)
+Einzelteil_27 <- read_tsv(ET_27)
+
+ET_31 <- read_file("Data/Einzelteil/Einzelteil_T31.txt")
+ET_31 <- gsub('', '\n', ET_31)
+ET_31 <- gsub('  ','\t', ET_31, fixed = T)
+Einzelteil_31 <- read_tsv(ET_31)
+
+ET_34 <- read_file("Data/Einzelteil/Einzelteil_T34.txt")
+ET_34 <- gsub('""', '"\n"', ET_34)
+ET_34 <- gsub(' | | ', '\t', ET_34, fixed = T)
+Einzelteil_34 <- read_tsv(ET_34)
+
+ET_36 <- read_file("Data/Einzelteil/Einzelteil_T36.txt")
+ET_36 <- gsub('" "', '"\n"', ET_36)
+ET_36 <- gsub('  ', '\t', ET_36, fixed = T)
+Einzelteil_36 <- read_tsv(ET_36)
+
+ET_39 <- read_file("Data/Einzelteil/Einzelteil_T39.txt")
+ET_39 <- gsub('', '\n', ET_39)
+ET_39 <- gsub('\\', '\t', ET_39, fixed = T)
+Einzelteil_39 <- read_tsv(ET_39)
+
+```
+
+#######################################################################################################################################################################################################################################################################################################################################################################################
+
+```{r}
+# !!!!!!!!!!!!!!!!!!!!!! Not
+col_names_22 <- c("Produktionsdatum.y", "Herstellernummer.y", "Werksnummer.y",	"Fehlerhaft.y", "Fehlerhaft_Datum.y", "Fehlerhaft_Fahrleistung.y", "ID_T22","Produktionsdatum", "Herstellernummer", "Werksnummer","Fehlerhaft", "Fehlerhaft_Datum", "Fehlerhaft_Fahrleistung")
+ET_22 <- read_file("Data/Einzelteil/Einzelteil_T22.txt")
+#ET_22 <- gsub('""', '"\n"', ET_22)
+ET_22 <- read_tsv(ET_22, col_names = col_names_22)
+```
+
+```{r}
+# !!!!!!!!!!!!!!!!!!!!!! Not
+ET_35 <- read_file("Data/Einzelteil/Einzelteil_T35.txt")
+ET_35 <- gsub('\\', '\t', ET_35, fixed = T)
+ET_35 <- gsub('""', '"\n"', ET_35)
+ET_35 <- read_tsv(ET_35)
+
+```
+
+
+```{r}
+
+Fahrzeuge_Fehler <- Fahrzeuge_2 %>%
+filter(Fehlerhaft == 1)
+```
+ET11 <- read_lines(Einzelteil_path[11], n_max = -1, skip = 0, na=character(), progress = show_progress())
+
+
