@@ -48,59 +48,59 @@ Fahrzeug_path <- file.path(path = "Data/Fahrzeug", Fahrzeug)
 
 ## Fahrzeugen import
 ```{r}
-Fahrzeuge_1 <- read_csv(Fahrzeug_path[5], col_names = TRUE, col_types = cols())
-Fahrzeuge_2 <- read_csv2(Fahrzeug_path[6], col_names = TRUE, col_types = cols())
-Fahrzeuge_3 <- read_csv(Fahrzeug_path[7], col_names = TRUE, col_types = cols())
-Fahrzeuge_4 <- read_csv2(Fahrzeug_path[8], col_names = TRUE, col_types = cols())
+Fahrzeuge_OEM1_01 <- read_csv(Fahrzeug_path[5], col_names = TRUE, col_types = cols())
+Fahrzeuge_OEM1_02 <- read_csv2(Fahrzeug_path[6], col_names = TRUE, col_types = cols())
+Fahrzeuge_OEM2_01 <- read_csv(Fahrzeug_path[7], col_names = TRUE, col_types = cols())
+Fahrzeuge_OEM2_02 <- read_csv2(Fahrzeug_path[8], col_names = TRUE, col_types = cols())
 ```
 
 ## Bestend Komponente import
 ```{r}
-Bestend_Kompanente_01 <- read_csv2(Komponente_path[1], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_02 <- read_csv2(Komponente_path[2], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_03 <- read_csv2(Komponente_path[3], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_04 <- read_csv2(Komponente_path[4], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_05 <- read_csv2(Komponente_path[5], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_06 <- read_csv2(Komponente_path[6], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_07 <- read_csv2(Komponente_path[7], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_08 <- read_csv2(Komponente_path[8], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_09 <- read_csv2(Komponente_path[9], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_10 <- read_csv2(Komponente_path[10], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_11 <- read_csv2(Komponente_path[11], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_12 <- read_csv2(Komponente_path[12], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_13 <- read_csv2(Komponente_path[13], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_14 <- read_csv2(Komponente_path[14], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_15 <- read_csv2(Komponente_path[15], col_names = TRUE, col_types = cols())
-Bestend_Kompanente_16 <- read_csv2(Komponente_path[16], col_names = TRUE, col_types = cols())
+Bestend_Komponente_01 <- read_csv2(Komponente_path[1], col_names = TRUE, col_types = cols())
+Bestend_Komponente_02 <- read_csv2(Komponente_path[2], col_names = TRUE, col_types = cols())
+Bestend_Komponente_03 <- read_csv2(Komponente_path[3], col_names = TRUE, col_types = cols())
+Bestend_Komponente_04 <- read_csv2(Komponente_path[4], col_names = TRUE, col_types = cols())
+Bestend_Komponente_05 <- read_csv2(Komponente_path[5], col_names = TRUE, col_types = cols())
+Bestend_Komponente_06 <- read_csv2(Komponente_path[6], col_names = TRUE, col_types = cols())
+Bestend_Komponente_07 <- read_csv2(Komponente_path[7], col_names = TRUE, col_types = cols())
+Bestend_Komponente_08 <- read_csv2(Komponente_path[8], col_names = TRUE, col_types = cols())
+Bestend_Komponente_09 <- read_csv2(Komponente_path[9], col_names = TRUE, col_types = cols())
+Bestend_Komponente_10 <- read_csv2(Komponente_path[10], col_names = TRUE, col_types = cols())
+Bestend_Komponente_11 <- read_csv2(Komponente_path[11], col_names = TRUE, col_types = cols())
+Bestend_Komponente_12 <- read_csv2(Komponente_path[12], col_names = TRUE, col_types = cols())
+Bestend_Komponente_13 <- read_csv2(Komponente_path[13], col_names = TRUE, col_types = cols())
+Bestend_Komponente_14 <- read_csv2(Komponente_path[14], col_names = TRUE, col_types = cols())
+Bestend_Komponente_15 <- read_csv2(Komponente_path[15], col_names = TRUE, col_types = cols())
+Bestend_Komponente_16 <- read_csv2(Komponente_path[16], col_names = TRUE, col_types = cols())
 ```
 
 
 ## Komponente import
 ```{r}
-Kompanente_01 <- read_csv(Komponente_path[17], col_names = TRUE, col_types = cols())
-Kompanente_02 <- read_csv2(Komponente_path[18], col_names = TRUE, col_types = cols())
-Kompanente_03 <- read_csv(Komponente_path[19], col_names = TRUE, col_types = cols())
-#Kompanente_04 <- read_csv2(Komponente_path[20], col_names = TRUE, col_types = cols())
+Komponente_01 <- read_csv(Komponente_path[17], col_names = TRUE, col_types = cols())
+Komponente_02 <- read_csv2(Komponente_path[18], col_names = TRUE, col_types = cols())
+Komponente_03 <- read_csv(Komponente_path[19], col_names = TRUE, col_types = cols())
+#Komponente_04 <- read_csv2(Komponente_path[20], col_names = TRUE, col_types = cols())
 k20<-read_file(Komponente_path[20])
 k20<-gsub("\t","\n",k20)
 k20<-gsub("\\","\t",k20, fixed=TRUE) 
-Kompanente_04<-read_tsv(k20, skip=1)
-#Kompanente_05 <- read_csv2(Komponente_path[21], col_names = TRUE, col_types = cols())
+Komponente_04<-read_tsv(k20, skip=1)
+#Komponente_05 <- read_csv2(Komponente_path[21], col_names = TRUE, col_types = cols())
 k21 <- read_file(Komponente_path[21])
 k21 <- gsub("", "\n", k21)
 k21 <- gsub("II","\t", k21, fixed = T)
-Kompanente_05 <- read_tsv(k21, skip=1)
-Kompanente_06 <- read.table(Komponente_path[22], header = T, sep =  "\\", stringsAsFactors = F)
-Kompanente_07 <- read.table(Komponente_path[23], header = T, sep =  "|", stringsAsFactors = F)
-Kompanente_08 <- read_csv2(Komponente_path[24], col_names = TRUE, col_types = cols())
-Kompanente_09 <- read_csv(Komponente_path[25], col_names = TRUE, col_types = cols())
-Kompanente_10 <- read.table(Komponente_path[26], header = T, sep =  "\\", stringsAsFactors = F)
-Kompanente_11 <- read_csv(Komponente_path[27], col_names = TRUE, col_types = cols())
-Kompanente_12 <- read_csv(Komponente_path[28], col_names = TRUE, col_types = cols())
-Kompanente_13 <- read_csv2(Komponente_path[29], col_names = TRUE, col_types = cols())
-Kompanente_14 <- read_csv(Komponente_path[30], col_names = TRUE, col_types = cols())
-Kompanente_15 <- read_csv2(Komponente_path[31], col_names = TRUE, col_types = cols())
-Kompanente_16 <- read.table(Komponente_path[32], header = T, sep =  "\t", stringsAsFactors = F)
+Komponente_05 <- read_tsv(k21, skip=1)
+Komponente_06 <- read.table(Komponente_path[22], header = T, sep =  "\\", stringsAsFactors = F)
+Komponente_07 <- read.table(Komponente_path[23], header = T, sep =  "|", stringsAsFactors = F)
+Komponente_08 <- read_csv2(Komponente_path[24], col_names = TRUE, col_types = cols())
+Komponente_09 <- read_csv(Komponente_path[25], col_names = TRUE, col_types = cols())
+Komponente_10 <- read.table(Komponente_path[26], header = T, sep =  "\\", stringsAsFactors = F)
+Komponente_11 <- read_csv(Komponente_path[27], col_names = TRUE, col_types = cols())
+Komponente_12 <- read_csv(Komponente_path[28], col_names = TRUE, col_types = cols())
+Komponente_13 <- read_csv2(Komponente_path[29], col_names = TRUE, col_types = cols())
+Komponente_14 <- read_csv(Komponente_path[30], col_names = TRUE, col_types = cols())
+Komponente_15 <- read_csv2(Komponente_path[31], col_names = TRUE, col_types = cols())
+Komponente_16 <- read.table(Komponente_path[32], header = T, sep =  "\t", stringsAsFactors = F)
 ```
 
 ## Einzelteile herunterladen (ohne 22, 35)
@@ -123,6 +123,8 @@ Einzelteil_10 <- read.csv2(Einzelteil_path[10])
 Einzelteil_12 <- read.csv2(Einzelteil_path[12])
 Einzelteil_13 <- read.csv2(Einzelteil_path[13])
 Einzelteil_14 <- read.csv2(Einzelteil_path[14])
+Einzelteil_15 <- read.csv2(Einzelteil_path[15])
+Einzelteil_17 <- read.csv2(Einzelteil_path[17])
 Einzelteil_18 <- read.csv2(Einzelteil_path[18])
 Einzelteil_21 <- read.csv2(Einzelteil_path[21])
 Einzelteil_23 <- read.csv2(Einzelteil_path[23])
@@ -132,102 +134,175 @@ Einzelteil_40 <- read.csv2("Data/Einzelteil/Einzelteil_T40.csv")
 
 
 
-
-ET_01 <- read_file(Einzelteil_path[1]) #die Datei als Vektor lesen
-ET_01 <- gsub(' | | ','\t', ET_01, fixed = T) #TAB als Trennzeichen
-ET_01 <- gsub(' ', '\n', ET_01) #Zeilenende definieren
-Einzelteil_01 <- read_tsv(ET_01) #Erstellung des Data-Frames
-
-ET_02 <- read_file(Einzelteil_path[2]) #die Datei als Vektor lesen
-ET_02 <- gsub('\t', '\n', ET_02) #Zeilenende definieren
-ET_02 <- gsub('  ','\t', ET_02, fixed = T) #TAB als Trennzeichen
-Einzelteil_02 <- read_tsv(ET_02) #Erstellung des Data-Frames
-
-ET_03 <- read_file(Einzelteil_path[3])
-ET_03 <- gsub('', '\n', ET_03)
-ET_03 <- gsub('|', '\t', ET_03, fixed = T)
-Einzelteil_03 <- read_tsv(ET_03)
-
-ET_07 <- read_file(Einzelteil_path[7])
-ET_07 <- gsub('""', '"\n"', ET_07)
-Einzelteil_07 <- read_tsv(ET_07)
-
-ET_09 <- read_file(Einzelteil_path[9])
-ET_09 <- gsub("\\", "\t", ET_09, fixed = T)
-ET_09 <- gsub("", "\n", ET_09)
-Einzelteil_08 <- read_tsv(ET_09)
-
-ET_11 <- read_file(Einzelteil_path[11])
-ET_11 <- gsub('', '\n', ET_11)
-Einzelteil_11 <- read_tsv(ET_11)
-
-ET_16 <- read_file(Einzelteil_path[16])
-ET_16 <- gsub('\t', '\n', ET_16)
-ET_16 <- gsub(' | | ', '\t', ET_16, fixed = T)
-Einzelteil_16 <- read_tsv(ET_16)
-
-ET_20 <- read_file(Einzelteil_path[20])
-ET_20 <- gsub(' | | ', '\t', ET_20, fixed = T)
-ET_20 <- gsub(' ', '\n', ET_20)
-Einzelteil_20 <- read_tsv(ET_20)
-
-ET_24 <- read_file(Einzelteil_path[24])
-ET_24 <- gsub('', '\n', ET_24)
-ET_24 <- gsub('  ', '\t', ET_24, fixed = T)
-Einzelteil_24 <- read_tsv(ET_24)
-
-ET_27 <- read_file(Einzelteil_path[27])
-ET_27 <- gsub('', '\n', ET_27)
-ET_27 <- gsub(' | | ', '\t', ET_27, fixed = T)
-Einzelteil_27 <- read_tsv(ET_27)
-
-ET_31 <- read_file("Data/Einzelteil/Einzelteil_T31.txt")
-ET_31 <- gsub('', '\n', ET_31)
-ET_31 <- gsub('  ','\t', ET_31, fixed = T)
-Einzelteil_31 <- read_tsv(ET_31)
-
-ET_34 <- read_file("Data/Einzelteil/Einzelteil_T34.txt")
-ET_34 <- gsub('""', '"\n"', ET_34)
-ET_34 <- gsub(' | | ', '\t', ET_34, fixed = T)
-Einzelteil_34 <- read_tsv(ET_34)
-
-ET_36 <- read_file("Data/Einzelteil/Einzelteil_T36.txt")
-ET_36 <- gsub('" "', '"\n"', ET_36)
-ET_36 <- gsub('  ', '\t', ET_36, fixed = T)
-Einzelteil_36 <- read_tsv(ET_36)
-
-ET_39 <- read_file("Data/Einzelteil/Einzelteil_T39.txt")
-ET_39 <- gsub('', '\n', ET_39)
-ET_39 <- gsub('\\', '\t', ET_39, fixed = T)
-Einzelteil_39 <- read_tsv(ET_39)
+# 
+# ET_01 <- read_file(Einzelteil_path[1]) #die Datei als Vektor lesen
+# ET_01 <- gsub(' | | ','\t', ET_01, fixed = T) #TAB als Trennzeichen
+# ET_01 <- gsub(' ', '\n', ET_01) #Zeilenende definieren
+# Einzelteil_01 <- read_tsv(ET_01) #Erstellung des Data-Frames
+# 
+# ET_02 <- read_file(Einzelteil_path[2]) #die Datei als Vektor lesen
+# ET_02 <- gsub('\t', '\n', ET_02) #Zeilenende definieren
+# ET_02 <- gsub('  ','\t', ET_02, fixed = T) #TAB als Trennzeichen
+# Einzelteil_02 <- read_tsv(ET_02) #Erstellung des Data-Frames
+# 
+# ET_03 <- read_file(Einzelteil_path[3])
+# ET_03 <- gsub('', '\n', ET_03)
+# ET_03 <- gsub('|', '\t', ET_03, fixed = T)
+# Einzelteil_03 <- read_tsv(ET_03)
+# 
+# ET_07 <- read_file(Einzelteil_path[7])
+# ET_07 <- gsub('""', '"\n"', ET_07)
+# Einzelteil_07 <- read_tsv(ET_07)
+# 
+# ET_09 <- read_file(Einzelteil_path[9])
+# ET_09 <- gsub("\\", "\t", ET_09, fixed = T)
+# ET_09 <- gsub("", "\n", ET_09)
+# Einzelteil_09 <- read_tsv(ET_09)
+# 
+# ET_11 <- read_file(Einzelteil_path[11])
+# ET_11 <- gsub('', '\n', ET_11)
+# Einzelteil_11 <- read_tsv(ET_11)
+# 
+# ET_16 <- read_file(Einzelteil_path[16])
+# ET_16 <- gsub('\t', '\n', ET_16)
+# ET_16 <- gsub(' | | ', '\t', ET_16, fixed = T)
+# Einzelteil_16 <- read_tsv(ET_16)
+# 
+# ET_20 <- read_file(Einzelteil_path[20])
+# ET_20 <- gsub(' | | ', '\t', ET_20, fixed = T)
+# ET_20 <- gsub(' ', '\n', ET_20)
+# Einzelteil_20 <- read_tsv(ET_20)
+# 
+# ET_24 <- read_file(Einzelteil_path[24])
+# ET_24 <- gsub('', '\n', ET_24)
+# ET_24 <- gsub('  ', '\t', ET_24, fixed = T)
+# Einzelteil_24 <- read_tsv(ET_24)
+# 
+# ET_27 <- read_file(Einzelteil_path[27])
+# ET_27 <- gsub('', '\n', ET_27)
+# ET_27 <- gsub(' | | ', '\t', ET_27, fixed = T)
+# Einzelteil_27 <- read_tsv(ET_27)
+# 
+# # ET_31 <- read_file("Data/Einzelteil/Einzelteil_T31.txt")
+# # ET_31 <- gsub('', '\n', ET_31)
+# # ET_31 <- gsub('  ','\t', ET_31, fixed = T)
+# # Einzelteil_31 <- read_tsv(ET_31)
+# 
+# ET_34 <- read_file("Data/Einzelteil/Einzelteil_T34.txt")
+# ET_34 <- gsub('""', '"\n"', ET_34)
+# ET_34 <- gsub(' | | ', '\t', ET_34, fixed = T)
+# Einzelteil_34 <- read_tsv(ET_34)
+# 
+# ET_36 <- read_file("Data/Einzelteil/Einzelteil_T36.txt")
+# ET_36 <- gsub('" "', '"\n"', ET_36)
+# ET_36 <- gsub('  ', '\t', ET_36, fixed = T)
+# Einzelteil_36 <- read_tsv(ET_36)
+# 
+# ET_39 <- read_file("Data/Einzelteil/Einzelteil_T39.txt")
+# ET_39 <- gsub('', '\n', ET_39)
+# ET_39 <- gsub('\\', '\t', ET_39, fixed = T)
+# Einzelteil_39 <- read_tsv(ET_39)
 
 ```
 
 #######################################################################################################################################################################################################################################################################################################################################################################################
+# Import Einzelteil 22 and 35, currently DOES NOT WORK
+# ```{r}
+# # !!!!!!!!!!!!!!!!!!!!!! Not
+# col_names_22 <- c("Produktionsdatum.y", "Herstellernummer.y", "Werksnummer.y",	"Fehlerhaft.y", "Fehlerhaft_Datum.y", "Fehlerhaft_Fahrleistung.y", "ID_T22","Produktionsdatum", "Herstellernummer", "Werksnummer","Fehlerhaft", "Fehlerhaft_Datum", "Fehlerhaft_Fahrleistung")
+# ET_22 <- read_file("Data/Einzelteil/Einzelteil_T22.txt")
+# #ET_22 <- gsub('""', '"\n"', ET_22)
+# ET_22 <- read_tsv(ET_22, col_names = col_names_22)
+# ```
 
-```{r}
-# !!!!!!!!!!!!!!!!!!!!!! Not
-col_names_22 <- c("Produktionsdatum.y", "Herstellernummer.y", "Werksnummer.y",	"Fehlerhaft.y", "Fehlerhaft_Datum.y", "Fehlerhaft_Fahrleistung.y", "ID_T22","Produktionsdatum", "Herstellernummer", "Werksnummer","Fehlerhaft", "Fehlerhaft_Datum", "Fehlerhaft_Fahrleistung")
-ET_22 <- read_file("Data/Einzelteil/Einzelteil_T22.txt")
-#ET_22 <- gsub('""', '"\n"', ET_22)
-ET_22 <- read_tsv(ET_22, col_names = col_names_22)
-```
+# ```{r}
+# # !!!!!!!!!!!!!!!!!!!!!! Not
+# ET_35 <- read_file("Data/Einzelteil/Einzelteil_T35.txt")
+# ET_35 <- gsub('\\', '\t', ET_35, fixed = T)
+# ET_35 <- gsub('""', '"\n"', ET_35)
+# ET_35 <- read_tsv(ET_35)
 
-```{r}
-# !!!!!!!!!!!!!!!!!!!!!! Not
-ET_35 <- read_file("Data/Einzelteil/Einzelteil_T35.txt")
-ET_35 <- gsub('\\', '\t', ET_35, fixed = T)
-ET_35 <- gsub('""', '"\n"', ET_35)
-ET_35 <- read_tsv(ET_35)
+# ```
 
-```
-
-
+<!-- 
 ```{r}
 
 Fahrzeuge_Fehler <- Fahrzeuge_2 %>%
 filter(Fehlerhaft == 1)
 ```
-ET11 <- read_lines(Einzelteil_path[11], n_max = -1, skip = 0, na=character(), progress = show_progress())
+ET11 <- read_lines(Einzelteil_path[11], n_max = -1, skip = 0, na=character(), progress = show_progress()) -->
 
 
+
+## Filter Fehlerhafte Einzelteile
+
+```{r}
+# usage of %in% with vector to drop NAs.
+# Here only .csv Data
+# Some data columns are called "columnname.x" some just "columnname", hence the filtering with "Fehlerhaft" or "Fehlerhaft.x"
+Fehlerhaft_Einzelteil_04 <- Einzelteil_04[Einzelteil_04$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_05 <- Einzelteil_05[Einzelteil_05$Fehlerhaft.x %in% c(1), ]
+Fehlerhaft_Einzelteil_06 <- Einzelteil_06[Einzelteil_06$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_08 <- Einzelteil_08[Einzelteil_08$Fehlerhaft.x %in% c(1), ]
+Fehlerhaft_Einzelteil_10 <- Einzelteil_10[Einzelteil_10$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_12 <- Einzelteil_12[Einzelteil_12$Fehlerhaft.x %in% c(1), ]
+Fehlerhaft_Einzelteil_13 <- Einzelteil_13[Einzelteil_13$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_14 <- Einzelteil_14[Einzelteil_14$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_15 <- Einzelteil_15[Einzelteil_15$Fehlerhaft.x %in% c(1), ]
+Fehlerhaft_Einzelteil_17 <- Einzelteil_17[Einzelteil_17$Fehlerhaft.x %in% c(1), ]
+Fehlerhaft_Einzelteil_18 <- Einzelteil_18[Einzelteil_18$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_19 <- Einzelteil_19[Einzelteil_19$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_21 <- Einzelteil_21[Einzelteil_21$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_23 <- Einzelteil_23[Einzelteil_23$Fehlerhaft.x %in% c(1), ]
+Fehlerhaft_Einzelteil_25 <- Einzelteil_25[Einzelteil_25$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_26 <- Einzelteil_26[Einzelteil_26$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_30 <- Einzelteil_30[Einzelteil_30$Fehlerhaft.x %in% c(1), ]
+Fehlerhaft_Einzelteil_32 <- Einzelteil_32[Einzelteil_32$Fehlerhaft.x %in% c(1), ]
+Fehlerhaft_Einzelteil_33 <- Einzelteil_33[Einzelteil_33$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_37 <- Einzelteil_37[Einzelteil_37$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Einzelteil_38 <- Einzelteil_38[Einzelteil_38$Fehlerhaft.x %in% c(1), ]
+Fehlerhaft_Einzelteil_40 <- Einzelteil_40[Einzelteil_40$Fehlerhaft %in% c(1), ]
+
+# Here .txt Data
+# Coming Soon...
+```
+
+## Filter Fehlerhafte Komponente
+
+```{r}
+# MAKE SURE TO CHECK EACH DATA FOR THE COLUMN NAME OF FEHLERHAFT
+# usage of %in% with vector to drop NAs.
+# Here only .csv Komponente
+Fehlerhaft_Komponente_01 <- Komponente_01[Komponente_01$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_02 <- Komponente_02[Komponente_02$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_03 <- Komponente_03[Komponente_03$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_08 <- Komponente_08[Komponente_08$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_09 <- Komponente_09[Komponente_09$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_11 <- Komponente_11[Komponente_11$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_12 <- Komponente_12[Komponente_12$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_13 <- Komponente_13[Komponente_13$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_14 <- Komponente_14[Komponente_14$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_15 <- Komponente_15[Komponente_15$Fehlerhaft %in% c(1), ]
+
+
+# Here .txt Komponente
+# somethings wrond with komponente 05 and 06, column names are not taken from the .txt data, rather they are random?!
+Fehlerhaft_Komponente_06 <- Komponente_06[Komponente_06$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_07 <- Komponente_07[Komponente_07$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_10 <- Komponente_10[Komponente_10$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Komponente_16 <- Komponente_16[Komponente_16$Fehlerhaft %in% c(1), ]
+```
+
+
+
+## Filter Fehlerhafte Fahrzeuge
+
+```{r}
+# usage of %in% with vector to drop NAs.
+Fehlerhaft_Farzeuge_OEM1_01 <- Fahrzeuge_OEM1_01[Fahrzeuge_OEM1_01$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Farzeuge_OEM1_02 <- Fahrzeuge_OEM1_02[Fahrzeuge_OEM1_02$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Farzeuge_OEM2_01 <- Fahrzeuge_OEM2_01[Fahrzeuge_OEM2_01$Fehlerhaft %in% c(1), ]
+Fehlerhaft_Farzeuge_OEM2_02 <- Fahrzeuge_OEM2_02[Fahrzeuge_OEM2_02$Fehlerhaft %in% c(1), ]
+
+
+```
