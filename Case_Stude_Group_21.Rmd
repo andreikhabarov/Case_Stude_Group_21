@@ -123,6 +123,8 @@ Einzelteil_10 <- read.csv2(Einzelteil_path[10])
 Einzelteil_12 <- read.csv2(Einzelteil_path[12])
 Einzelteil_13 <- read.csv2(Einzelteil_path[13])
 Einzelteil_14 <- read.csv2(Einzelteil_path[14])
+Einzelteil_15 <- read.csv2(Einzelteil_path[15])
+Einzelteil_17 <- read.csv2(Einzelteil_path[17])
 Einzelteil_18 <- read.csv2(Einzelteil_path[18])
 Einzelteil_21 <- read.csv2(Einzelteil_path[21])
 Einzelteil_23 <- read.csv2(Einzelteil_path[23])
@@ -132,74 +134,74 @@ Einzelteil_40 <- read.csv2("Data/Einzelteil/Einzelteil_T40.csv")
 
 
 
-
-ET_01 <- read_file(Einzelteil_path[1]) #die Datei als Vektor lesen
-ET_01 <- gsub(' | | ','\t', ET_01, fixed = T) #TAB als Trennzeichen
-ET_01 <- gsub(' ', '\n', ET_01) #Zeilenende definieren
-Einzelteil_01 <- read_tsv(ET_01) #Erstellung des Data-Frames
-
-ET_02 <- read_file(Einzelteil_path[2]) #die Datei als Vektor lesen
-ET_02 <- gsub('\t', '\n', ET_02) #Zeilenende definieren
-ET_02 <- gsub('  ','\t', ET_02, fixed = T) #TAB als Trennzeichen
-Einzelteil_02 <- read_tsv(ET_02) #Erstellung des Data-Frames
-
-ET_03 <- read_file(Einzelteil_path[3])
-ET_03 <- gsub('', '\n', ET_03)
-ET_03 <- gsub('|', '\t', ET_03, fixed = T)
-Einzelteil_03 <- read_tsv(ET_03)
-
-ET_07 <- read_file(Einzelteil_path[7])
-ET_07 <- gsub('""', '"\n"', ET_07)
-Einzelteil_07 <- read_tsv(ET_07)
-
-ET_09 <- read_file(Einzelteil_path[9])
-ET_09 <- gsub("\\", "\t", ET_09, fixed = T)
-ET_09 <- gsub("", "\n", ET_09)
-Einzelteil_09 <- read_tsv(ET_09)
-
-ET_11 <- read_file(Einzelteil_path[11])
-ET_11 <- gsub('', '\n', ET_11)
-Einzelteil_11 <- read_tsv(ET_11)
-
-ET_16 <- read_file(Einzelteil_path[16])
-ET_16 <- gsub('\t', '\n', ET_16)
-ET_16 <- gsub(' | | ', '\t', ET_16, fixed = T)
-Einzelteil_16 <- read_tsv(ET_16)
-
-ET_20 <- read_file(Einzelteil_path[20])
-ET_20 <- gsub(' | | ', '\t', ET_20, fixed = T)
-ET_20 <- gsub(' ', '\n', ET_20)
-Einzelteil_20 <- read_tsv(ET_20)
-
-ET_24 <- read_file(Einzelteil_path[24])
-ET_24 <- gsub('', '\n', ET_24)
-ET_24 <- gsub('  ', '\t', ET_24, fixed = T)
-Einzelteil_24 <- read_tsv(ET_24)
-
-ET_27 <- read_file(Einzelteil_path[27])
-ET_27 <- gsub('', '\n', ET_27)
-ET_27 <- gsub(' | | ', '\t', ET_27, fixed = T)
-Einzelteil_27 <- read_tsv(ET_27)
-
-ET_31 <- read_file("Data/Einzelteil/Einzelteil_T31.txt")
-ET_31 <- gsub('', '\n', ET_31)
-ET_31 <- gsub('  ','\t', ET_31, fixed = T)
-Einzelteil_31 <- read_tsv(ET_31)
-
-ET_34 <- read_file("Data/Einzelteil/Einzelteil_T34.txt")
-ET_34 <- gsub('""', '"\n"', ET_34)
-ET_34 <- gsub(' | | ', '\t', ET_34, fixed = T)
-Einzelteil_34 <- read_tsv(ET_34)
-
-ET_36 <- read_file("Data/Einzelteil/Einzelteil_T36.txt")
-ET_36 <- gsub('" "', '"\n"', ET_36)
-ET_36 <- gsub('  ', '\t', ET_36, fixed = T)
-Einzelteil_36 <- read_tsv(ET_36)
-
-ET_39 <- read_file("Data/Einzelteil/Einzelteil_T39.txt")
-ET_39 <- gsub('', '\n', ET_39)
-ET_39 <- gsub('\\', '\t', ET_39, fixed = T)
-Einzelteil_39 <- read_tsv(ET_39)
+# 
+# ET_01 <- read_file(Einzelteil_path[1]) #die Datei als Vektor lesen
+# ET_01 <- gsub(' | | ','\t', ET_01, fixed = T) #TAB als Trennzeichen
+# ET_01 <- gsub(' ', '\n', ET_01) #Zeilenende definieren
+# Einzelteil_01 <- read_tsv(ET_01) #Erstellung des Data-Frames
+# 
+# ET_02 <- read_file(Einzelteil_path[2]) #die Datei als Vektor lesen
+# ET_02 <- gsub('\t', '\n', ET_02) #Zeilenende definieren
+# ET_02 <- gsub('  ','\t', ET_02, fixed = T) #TAB als Trennzeichen
+# Einzelteil_02 <- read_tsv(ET_02) #Erstellung des Data-Frames
+# 
+# ET_03 <- read_file(Einzelteil_path[3])
+# ET_03 <- gsub('', '\n', ET_03)
+# ET_03 <- gsub('|', '\t', ET_03, fixed = T)
+# Einzelteil_03 <- read_tsv(ET_03)
+# 
+# ET_07 <- read_file(Einzelteil_path[7])
+# ET_07 <- gsub('""', '"\n"', ET_07)
+# Einzelteil_07 <- read_tsv(ET_07)
+# 
+# ET_09 <- read_file(Einzelteil_path[9])
+# ET_09 <- gsub("\\", "\t", ET_09, fixed = T)
+# ET_09 <- gsub("", "\n", ET_09)
+# Einzelteil_09 <- read_tsv(ET_09)
+# 
+# ET_11 <- read_file(Einzelteil_path[11])
+# ET_11 <- gsub('', '\n', ET_11)
+# Einzelteil_11 <- read_tsv(ET_11)
+# 
+# ET_16 <- read_file(Einzelteil_path[16])
+# ET_16 <- gsub('\t', '\n', ET_16)
+# ET_16 <- gsub(' | | ', '\t', ET_16, fixed = T)
+# Einzelteil_16 <- read_tsv(ET_16)
+# 
+# ET_20 <- read_file(Einzelteil_path[20])
+# ET_20 <- gsub(' | | ', '\t', ET_20, fixed = T)
+# ET_20 <- gsub(' ', '\n', ET_20)
+# Einzelteil_20 <- read_tsv(ET_20)
+# 
+# ET_24 <- read_file(Einzelteil_path[24])
+# ET_24 <- gsub('', '\n', ET_24)
+# ET_24 <- gsub('  ', '\t', ET_24, fixed = T)
+# Einzelteil_24 <- read_tsv(ET_24)
+# 
+# ET_27 <- read_file(Einzelteil_path[27])
+# ET_27 <- gsub('', '\n', ET_27)
+# ET_27 <- gsub(' | | ', '\t', ET_27, fixed = T)
+# Einzelteil_27 <- read_tsv(ET_27)
+# 
+# # ET_31 <- read_file("Data/Einzelteil/Einzelteil_T31.txt")
+# # ET_31 <- gsub('', '\n', ET_31)
+# # ET_31 <- gsub('  ','\t', ET_31, fixed = T)
+# # Einzelteil_31 <- read_tsv(ET_31)
+# 
+# ET_34 <- read_file("Data/Einzelteil/Einzelteil_T34.txt")
+# ET_34 <- gsub('""', '"\n"', ET_34)
+# ET_34 <- gsub(' | | ', '\t', ET_34, fixed = T)
+# Einzelteil_34 <- read_tsv(ET_34)
+# 
+# ET_36 <- read_file("Data/Einzelteil/Einzelteil_T36.txt")
+# ET_36 <- gsub('" "', '"\n"', ET_36)
+# ET_36 <- gsub('  ', '\t', ET_36, fixed = T)
+# Einzelteil_36 <- read_tsv(ET_36)
+# 
+# ET_39 <- read_file("Data/Einzelteil/Einzelteil_T39.txt")
+# ET_39 <- gsub('', '\n', ET_39)
+# ET_39 <- gsub('\\', '\t', ET_39, fixed = T)
+# Einzelteil_39 <- read_tsv(ET_39)
 
 ```
 
@@ -259,7 +261,6 @@ Fehlerhaft_Einzelteil_32 <- Einzelteil_32[Einzelteil_32$Fehlerhaft.x %in% c(1), 
 Fehlerhaft_Einzelteil_33 <- Einzelteil_33[Einzelteil_33$Fehlerhaft %in% c(1), ]
 Fehlerhaft_Einzelteil_37 <- Einzelteil_37[Einzelteil_37$Fehlerhaft %in% c(1), ]
 Fehlerhaft_Einzelteil_38 <- Einzelteil_38[Einzelteil_38$Fehlerhaft.x %in% c(1), ]
-Fehlerhaft_Einzelteil_39 <- Einzelteil_39[Einzelteil_39$Fehlerhaft.x %in% c(1), ]
 Fehlerhaft_Einzelteil_40 <- Einzelteil_40[Einzelteil_40$Fehlerhaft %in% c(1), ]
 
 # Here .txt Data
