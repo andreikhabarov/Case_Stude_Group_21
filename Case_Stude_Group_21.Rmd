@@ -1,0 +1,929 @@
+---
+title: "Case_Study_Group_21"
+group: "Gruppe 21"
+author: "Andrei Khabarov, Hikmat Shahi, Dimitri Zubitashvili, Dmytro Davydenko"
+date: "12/07/2020" 
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Aufgabestellung
+
+Wir sind die Mitarbeiter in der Abteilung "Total Vehicle Quality" eines Automobilkonzerns, der Fahrzeugtypen "OEM1" und "OEM2" herstellt. Die Lieferkette besteht aus Teilelieferanten und Komponentenlieferanten. Das Produktionswerk installiert die Komponenten in den Fahrzeugen. Unsere Aufgabe ist, festzustellen, welches OEM-Werk sich im Laufe der Jahre 2013-2015 am besten verbessert hat (durch Vergleichen der Fehleranteile zwischen den Produktionsjahren). Fahrzeuge sollten als defekt angesehen werden, wenn ein Fehler auf Teile-, Komponenten- und / oder Fahrzeugebene auftritt. Wenn Fehler auf mehreren auftreten Ebenen wird nur der zuerst aufgetretene Fehler berücksichtigt
+
+
+
+################################################################################################
+Daten Prüfen als GT
+################################################################################################
+
+
+## Import Biblioteken
+```{r}
+
+if(!require(tidyverse)){
+  install.package("tidyverse")
+  library(tidyverse)
+}
+
+if(!require(stringr)){
+  install.package("stringr")
+  library(stringr)
+}
+
+if(!require(readr)){
+  install.package("readr")
+  library(readr)
+}
+```
+
+## Linlek zu Datein einsetzen
+```{r}
+Einzelteil <- list.files(path = "Data/Einzelteil")
+Einzelteil_path <- file.path(path = "Data/Einzelteil", Einzelteil)
+
+Komponente <- list.files(path = "Data/Komponente")
+Komponente_path <- file.path(path = "Data/Komponente", Komponente)
+
+Fahrzeug <- list.files(path = "Data/Fahrzeug")
+Fahrzeug_path <- file.path(path = "Data/Fahrzeug", Fahrzeug)
+```
+
+## Bestend Fahrzeugen import
+```{r}
+Bestend_Fahrzeuge_01 <- read_csv2(Fahrzeug_path[1], col_names = TRUE, col_types = cols())
+Bestend_Fahrzeuge_02 <- read_csv2(Fahrzeug_path[2], col_names = TRUE, col_types = cols())
+Bestend_Fahrzeuge_03 <- read_csv2(Fahrzeug_path[3], col_names = TRUE, col_types = cols())
+Bestend_Fahrzeuge_04 <- read_csv2(Fahrzeug_path[4], col_names = TRUE, col_types = cols())
+```
+
+## Fahrzeugen import
+```{r}
+Fahrzeuge_01 <- read_csv(Fahrzeug_path[5], col_names = TRUE, col_types = cols())
+Fahrzeuge_02 <- read_csv2(Fahrzeug_path[6], col_names = TRUE, col_types = cols())
+Fahrzeuge_03 <- read_csv(Fahrzeug_path[7], col_names = TRUE, col_types = cols())
+Fahrzeuge_04 <- read_csv2(Fahrzeug_path[8], col_names = TRUE, col_types = cols())
+```
+
+## Bestend Komponente import
+```{r}
+Bestend_Kompanente_01 <- read_csv2(Komponente_path[1], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_02 <- read_csv2(Komponente_path[2], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_03 <- read_csv2(Komponente_path[3], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_04 <- read_csv2(Komponente_path[4], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_05 <- read_csv2(Komponente_path[5], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_06 <- read_csv2(Komponente_path[6], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_07 <- read_csv2(Komponente_path[7], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_08 <- read_csv2(Komponente_path[8], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_09 <- read_csv2(Komponente_path[9], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_10 <- read_csv2(Komponente_path[10], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_11 <- read_csv2(Komponente_path[11], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_12 <- read_csv2(Komponente_path[12], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_13 <- read_csv2(Komponente_path[13], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_14 <- read_csv2(Komponente_path[14], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_15 <- read_csv2(Komponente_path[15], col_names = TRUE, col_types = cols())
+Bestend_Kompanente_16 <- read_csv2(Komponente_path[16], col_names = TRUE, col_types = cols())
+```
+
+## Komponente import
+```{r}
+Kompanente_01 <- read_csv(Komponente_path[17], col_names = TRUE, col_types = cols())
+Kompanente_02 <- read_csv2(Komponente_path[18], col_names = TRUE, col_types = cols())
+Kompanente_03 <- read_csv(Komponente_path[19], col_names = TRUE, col_types = cols())
+#Kompanente_04 <- read_csv2(Komponente_path[20], col_names = TRUE, col_types = cols())
+k20<-read_file(Komponente_path[20])
+k20<-gsub("\t","\n",k20)
+k20<-gsub("\\","\t",k20, fixed=TRUE) 
+Kompanente_04<-read_tsv(k20, skip=1)
+#Kompanente_05 <- read_csv2(Komponente_path[21], col_names = TRUE, col_types = cols())
+k21 <- read_file(Komponente_path[21])
+k21 <- gsub("", "\n", k21)
+k21 <- gsub("II","\t", k21, fixed = T)
+Kompanente_05 <- read_tsv(k21, skip=1)
+Kompanente_06 <- read.table(Komponente_path[22], header = T, sep =  "\\", stringsAsFactors = F)
+Kompanente_07 <- read.table(Komponente_path[23], header = T, sep =  "|", stringsAsFactors = F)
+Kompanente_08 <- read_csv2(Komponente_path[24], col_names = TRUE, col_types = cols())
+Kompanente_09 <- read_csv(Komponente_path[25], col_names = TRUE, col_types = cols())
+Kompanente_10 <- read.table(Komponente_path[26], header = T, sep =  "\\", stringsAsFactors = F)
+Kompanente_11 <- read_csv(Komponente_path[27], col_names = TRUE, col_types = cols())
+Kompanente_12 <- read_csv(Komponente_path[28], col_names = TRUE, col_types = cols())
+Kompanente_13 <- read_csv2(Komponente_path[29], col_names = TRUE, col_types = cols())
+Kompanente_14 <- read_csv(Komponente_path[30], col_names = TRUE, col_types = cols())
+Kompanente_15 <- read_csv2(Komponente_path[31], col_names = TRUE, col_types = cols())
+Kompanente_16 <- read.table(Komponente_path[32], header = T, sep =  "\t", stringsAsFactors = F)
+```
+
+## Einzelteile import
+```{r}
+
+Einzelteil_05 <- read.csv(Einzelteil_path[5])
+Einzelteil_06 <- read.csv(Einzelteil_path[6])
+Einzelteil_08 <- read.csv(Einzelteil_path[8])
+Einzelteil_19 <- read.csv(Einzelteil_path[19])
+Einzelteil_25 <- read.csv(Einzelteil_path[25])
+Einzelteil_30 <- read.csv("Data/Einzelteil/Einzelteil_T30.csv")
+Einzelteil_33 <- read.csv("Data/Einzelteil/Einzelteil_T33.csv")
+Einzelteil_37 <- read.csv("Data/Einzelteil/Einzelteil_T37.csv")
+Einzelteil_38 <- read.csv("Data/Einzelteil/Einzelteil_T38.csv")
+
+Einzelteil_04 <- read.csv2(Einzelteil_path[4])
+Einzelteil_10 <- read.csv2(Einzelteil_path[10])
+Einzelteil_12 <- read.csv2(Einzelteil_path[12])
+Einzelteil_13 <- read.csv2(Einzelteil_path[13])
+Einzelteil_14 <- read.csv2(Einzelteil_path[14])
+Einzelteil_15 <- read.csv2(Einzelteil_path[15])
+Einzelteil_17 <- read.csv2(Einzelteil_path[17])
+Einzelteil_18 <- read.csv2(Einzelteil_path[18])
+Einzelteil_21 <- read.csv2(Einzelteil_path[21])
+Einzelteil_23 <- read.csv2(Einzelteil_path[23])
+Einzelteil_26 <- read.csv2(Einzelteil_path[26])
+Einzelteil_32 <- read.csv2("Data/Einzelteil/Einzelteil_T32.csv")
+Einzelteil_40 <- read.csv2("Data/Einzelteil/Einzelteil_T40.csv")
+
+
+ET_01 <- read_file(Einzelteil_path[1]) #die Datei als Vektor lesen
+ET_01 <- gsub(' | | ','\t', ET_01, fixed = T) #TAB als Trennzeichen
+ET_01 <- gsub(' ', '\n', ET_01) #Zeilenende definieren
+Einzelteil_01 <- read_tsv(ET_01) #Erstellung des Data-Frames
+
+ET_02 <- read_file(Einzelteil_path[2]) #die Datei als Vektor lesen
+ET_02 <- gsub('\t', '\n', ET_02) #Zeilenende definieren
+ET_02 <- gsub('  ','\t', ET_02, fixed = T) #TAB als Trennzeichen
+Einzelteil_02 <- read_tsv(ET_02) #Erstellung des Data-Frames
+
+ET_03 <- read_file(Einzelteil_path[3])
+ET_03 <- gsub('', '\n', ET_03)
+ET_03 <- gsub('|', '\t', ET_03, fixed = T)
+Einzelteil_03 <- read_tsv(ET_03)
+
+ET_07 <- read_file(Einzelteil_path[7])
+ET_07 <- gsub('""', '"\n"', ET_07)
+Einzelteil_07 <- read_tsv(ET_07)
+
+ET_09 <- read_file(Einzelteil_path[9])
+ET_09 <- gsub("\\", "\t", ET_09, fixed = T)
+ET_09 <- gsub("", "\n", ET_09)
+Einzelteil_09 <- read_tsv(ET_09)
+
+ET_11 <- read_file(Einzelteil_path[11])
+ET_11 <- gsub('', '\n', ET_11)
+Einzelteil_11 <- read_tsv(ET_11)
+
+ET_16 <- read_file(Einzelteil_path[16])
+ET_16 <- gsub('\t', '\n', ET_16)
+ET_16 <- gsub(' | | ', '\t', ET_16, fixed = T)
+Einzelteil_16 <- read_tsv(ET_16)
+
+ET_20 <- read_file(Einzelteil_path[20])
+ET_20 <- gsub(' | | ', '\t', ET_20, fixed = T)
+ET_20 <- gsub(' ', '\n', ET_20)
+Einzelteil_20 <- read_tsv(ET_20)
+
+ET_22 <- read_file(Einzelteil_path[22])
+ET_22 <- gsub('NA', '"NA"', ET_22)
+ET_22 <- gsub('""', '"\n"', ET_22)
+Einzelteil_22 <- read_tsv(ET_22)
+
+
+ET_24 <- read_file(Einzelteil_path[24])
+ET_24 <- gsub('', '\n', ET_24)
+ET_24 <- gsub('  ', '\t', ET_24, fixed = T)
+Einzelteil_24 <- read_tsv(ET_24)
+
+ET_27 <- read_file(Einzelteil_path[27])
+ET_27 <- gsub('', '\n', ET_27)
+ET_27 <- gsub(' | | ', '\t', ET_27, fixed = T)
+Einzelteil_27 <- read_tsv(ET_27)
+
+ET_31 <- read_file("Data/Einzelteil/Einzelteil_T31.txt")
+ET_31 <- gsub('', '\n', ET_31)
+ET_31 <- gsub('  ','\t', ET_31, fixed = T)
+Einzelteil_31 <- read_tsv(ET_31)
+
+ET_34 <- read_file("Data/Einzelteil/Einzelteil_T34.txt")
+ET_34 <- gsub('""', '"\n"', ET_34)
+ET_34 <- gsub(' | | ', '\t', ET_34, fixed = T)
+Einzelteil_34 <- read_tsv(ET_34)
+
+ET_35 <- read_file("Data/Einzelteil/Einzelteil_T35.txt")
+ET_35 <- gsub('NA', '"NA"', ET_35)
+ET_35 <- gsub('""', '"\n"', ET_35)
+ET_35 <- gsub('\\', '\t', ET_35, fixed = T)
+Einzelteil_35 <- read_tsv(ET_35)
+
+ET_36 <- read_file("Data/Einzelteil/Einzelteil_T36.txt")
+ET_36 <- gsub('" "', '"\n"', ET_36)
+ET_36 <- gsub('  ', '\t', ET_36, fixed = T)
+Einzelteil_36 <- read_tsv(ET_36)
+
+ET_39 <- read_file("Data/Einzelteil/Einzelteil_T39.txt")
+ET_39 <- gsub('', '\n', ET_39)
+ET_39 <- gsub('\\', '\t', ET_39, fixed = T)
+Einzelteil_39 <- read_tsv(ET_39)
+
+```
+
+## Übernemen nur richtigen Spalten aus der Einzelteil Tabelen + filtriren nach Fehlerhaft == 1
+## Bekommen alle Einzelteil, die kaput sind.
+```{r}
+Fehlerhaft_Einzelteil_01 <- select(Einzelteil_01, Produktionsdatum.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x, ID_T01.y) %>%
+filter(Fehlerhaft_Datum.x == 1)
+
+Fehlerhaft_Einzelteil_02 <- select(Einzelteil_02, Produktionsdatum.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x, ID_T02.y) %>%
+filter(Fehlerhaft_Datum.x == 1)
+
+Fehlerhaft_Einzelteil_03 <- select(Einzelteil_03, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung, Produktionsdatum_Origin_01011970) %>%
+filter(Fehlerhaft_Datum == 1)
+
+Fehlerhaft_Einzelteil_04 <- select(Einzelteil_04, ID_T04, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_05 <- select(Einzelteil_05, ID_T05.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Einzelteil_06 <- select(Einzelteil_06, ID_T06, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_07 <- select(Einzelteil_07, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung, Produktionsdatum_Origin_01011970) %>%
+filter(Fehlerhaft_Datum == 1)
+
+Fehlerhaft_Einzelteil_08 <- select(Einzelteil_08, ID_T08, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_09 <- select(Einzelteil_09, Produktionsdatum.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x, ID_T09.y) %>%
+filter(Fehlerhaft_Datum.x == 1)
+
+Fehlerhaft_Einzelteil_10 <- select(Einzelteil_10, ID_T10, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_11 <- select(Einzelteil_11, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung, Produktionsdatum_Origin_01011970) %>%
+filter(Fehlerhaft_Datum == 1)
+
+Fehlerhaft_Einzelteil_12 <- select(Einzelteil_12, ID_T12.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Einzelteil_13 <- select(Einzelteil_13, ID_T13, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_14 <- select(Einzelteil_14, ID_T14, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_15 <- select(Einzelteil_15, ID_T15.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Einzelteil_16 <- select(Einzelteil_16, Produktionsdatum.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x, ID_T16.y) %>%
+filter(Fehlerhaft_Datum.x == 1)
+
+Fehlerhaft_Einzelteil_17 <- select(Einzelteil_17, ID_T17.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Einzelteil_18 <- select(Einzelteil_18, ID_T18, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_19 <- select(Einzelteil_19, ID_T19, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_20 <- select(Einzelteil_20, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung, Produktionsdatum_Origin_01011970) %>%
+filter(Fehlerhaft_Datum == 1)
+
+Fehlerhaft_Einzelteil_21 <- select(Einzelteil_21, ID_T21, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_22 <- select(Einzelteil_22, Produktionsdatum.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x, ID_T22.y) %>%
+filter(Fehlerhaft_Datum.x == 1)
+
+Fehlerhaft_Einzelteil_23 <- select(Einzelteil_23, ID_T23.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Einzelteil_24 <- select(Einzelteil_24, Produktionsdatum.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x, ID_T24.y) %>%
+filter(Fehlerhaft_Datum.x == 1)
+
+Fehlerhaft_Einzelteil_25 <- select(Einzelteil_25, ID_T25, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_26 <- select(Einzelteil_26, ID_T26, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_27 <- select(Einzelteil_27, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung, Produktionsdatum_Origin_01011970) %>%
+filter(Fehlerhaft_Datum == 1)
+
+Fehlerhaft_Einzelteil_30 <- select(Einzelteil_30, ID_T30.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Einzelteil_31 <- select(Einzelteil_31, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung, Produktionsdatum_Origin_01011970) %>%
+filter(Fehlerhaft_Datum == 1)
+
+Fehlerhaft_Einzelteil_32 <- select(Einzelteil_32, ID_T32.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Einzelteil_33 <- select(Einzelteil_33, ID_T33, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_34 <- select(Einzelteil_34, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung, Produktionsdatum_Origin_01011970) %>%
+filter(Fehlerhaft_Datum == 1)
+
+Fehlerhaft_Einzelteil_35 <- select(Einzelteil_35, Produktionsdatum.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x, ID_T35.y) %>%
+filter(Fehlerhaft_Datum.x == 1)
+
+Fehlerhaft_Einzelteil_36 <- select(Einzelteil_36, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung, Produktionsdatum_Origin_01011970) %>%
+filter(Fehlerhaft_Datum == 1)
+
+Fehlerhaft_Einzelteil_37 <- select(Einzelteil_37, ID_T37, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Einzelteil_38 <- select(Einzelteil_38, ID_T38.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Einzelteil_39 <- select(Einzelteil_39, Produktionsdatum.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x, ID_T39.y) %>%
+filter(Fehlerhaft_Datum.x == 1)
+
+Fehlerhaft_Einzelteil_40 <- select(Einzelteil_40, ID_T40, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+```
+
+## Geben gleiche Spaltenname für alle kapute Einzelteil. Damit wir später die Tabellen addiren können.
+```{r}
+colnames(Fehlerhaft_Einzelteil_01) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_02) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_03) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_04) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_05) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_06) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_07) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_08) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_09) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_10) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_11) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_12) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_13) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_14) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_15) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_16) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_17) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_18) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_19) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_20) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_21) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_22) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_23) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_24) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_25) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_26) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_27) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_30) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_31) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_32) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_33) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_34) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_35) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_36) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_37) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_38) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_39) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Einzelteil_40) <- c("ID","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+
+```
+
+## left join die Tabellen mit kaputen Einzenteilen zu Bestend Kompanente (Welche Teile wir adiren müsssen, kann man manuel in Bestend Kompanente reinschauen). Filteren Kompanente, wo mindestens eine Teil kaput ist.
+```{r}
+
+Fehl_Komp_nach_Teil_01 <- left_join( Bestend_Kompanente_01, Fehlerhaft_Einzelteil_01,  by=c("ID_T1"="ID"))
+Fehl_Komp_nach_Teil_01 <- left_join( Fehl_Komp_nach_Teil_01, Fehlerhaft_Einzelteil_02,  by=c("ID_T2"="ID"))
+Fehl_Komp_nach_Teil_01 <- left_join( Fehl_Komp_nach_Teil_01, Fehlerhaft_Einzelteil_03,  by=c("ID_T3"="ID"))
+Fehl_Komp_nach_Teil_01 <- left_join( Fehl_Komp_nach_Teil_01, Fehlerhaft_Einzelteil_04,  by=c("ID_T4"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft.x.x == 1| Fehlerhaft.y.y == 1)
+
+Fehl_Komp_nach_Teil_02 <- left_join( Bestend_Kompanente_02, Fehlerhaft_Einzelteil_01,  by=c("ID_T1"="ID"))
+Fehl_Komp_nach_Teil_02 <- left_join( Fehl_Komp_nach_Teil_02, Fehlerhaft_Einzelteil_02,  by=c("ID_T2"="ID"))
+Fehl_Komp_nach_Teil_02 <- left_join( Fehl_Komp_nach_Teil_02, Fehlerhaft_Einzelteil_07,  by=c("ID_T7"="ID"))
+Fehl_Komp_nach_Teil_02 <- left_join( Fehl_Komp_nach_Teil_02, Fehlerhaft_Einzelteil_08,  by=c("ID_T8"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft.x.x == 1| Fehlerhaft.y.y == 1)
+
+Fehl_Komp_nach_Teil_03 <- left_join( Bestend_Kompanente_03, Fehlerhaft_Einzelteil_01,  by=c("ID_T1"="ID"))
+Fehl_Komp_nach_Teil_03 <- left_join( Fehl_Komp_nach_Teil_03, Fehlerhaft_Einzelteil_02,  by=c("ID_T2"="ID"))
+Fehl_Komp_nach_Teil_03 <- left_join( Fehl_Komp_nach_Teil_03, Fehlerhaft_Einzelteil_05,  by=c("ID_T5"="ID"))
+Fehl_Komp_nach_Teil_03 <- left_join( Fehl_Komp_nach_Teil_03, Fehlerhaft_Einzelteil_06,  by=c("ID_T6"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft.x.x == 1| Fehlerhaft.y.y == 1)
+
+Fehl_Komp_nach_Teil_04 <- left_join( Bestend_Kompanente_04, Fehlerhaft_Einzelteil_01,  by=c("ID_T1"="ID"))
+Fehl_Komp_nach_Teil_04 <- left_join( Fehl_Komp_nach_Teil_04, Fehlerhaft_Einzelteil_02,  by=c("ID_T2"="ID"))
+Fehl_Komp_nach_Teil_04 <- left_join( Fehl_Komp_nach_Teil_04, Fehlerhaft_Einzelteil_09,  by=c("ID_T9"="ID"))
+Fehl_Komp_nach_Teil_04 <- left_join( Fehl_Komp_nach_Teil_04, Fehlerhaft_Einzelteil_10,  by=c("ID_T10"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft.x.x == 1| Fehlerhaft.y.y == 1)
+
+Fehl_Komp_nach_Teil_05 <- left_join( Bestend_Kompanente_05, Fehlerhaft_Einzelteil_11,  by=c("ID_T11"="ID"))
+Fehl_Komp_nach_Teil_05 <- left_join( Fehl_Komp_nach_Teil_05, Fehlerhaft_Einzelteil_14,  by=c("ID_T14"="ID"))
+Fehl_Komp_nach_Teil_05 <- left_join( Fehl_Komp_nach_Teil_05, Fehlerhaft_Einzelteil_15,  by=c("ID_T15"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft == 1)
+
+Fehl_Komp_nach_Teil_06 <- left_join( Bestend_Kompanente_06, Fehlerhaft_Einzelteil_16,  by=c("ID_T16"="ID"))
+Fehl_Komp_nach_Teil_06 <- left_join( Fehl_Komp_nach_Teil_06, Fehlerhaft_Einzelteil_19,  by=c("ID_T19"="ID"))
+Fehl_Komp_nach_Teil_06 <- left_join( Fehl_Komp_nach_Teil_06, Fehlerhaft_Einzelteil_20,  by=c("ID_T20"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft == 1)
+
+Fehl_Komp_nach_Teil_07 <- left_join( Bestend_Kompanente_07, Fehlerhaft_Einzelteil_11,  by=c("ID_T11"="ID"))
+Fehl_Komp_nach_Teil_07 <- left_join( Fehl_Komp_nach_Teil_07, Fehlerhaft_Einzelteil_12,  by=c("ID_T12"="ID"))
+Fehl_Komp_nach_Teil_07 <- left_join( Fehl_Komp_nach_Teil_07, Fehlerhaft_Einzelteil_13,  by=c("ID_T13"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft == 1)
+
+Fehl_Komp_nach_Teil_08 <- left_join( Bestend_Kompanente_08, Fehlerhaft_Einzelteil_16,  by=c("ID_T16"="ID"))
+Fehl_Komp_nach_Teil_08 <- left_join( Fehl_Komp_nach_Teil_08, Fehlerhaft_Einzelteil_17,  by=c("ID_T17"="ID"))
+Fehl_Komp_nach_Teil_08 <- left_join( Fehl_Komp_nach_Teil_08, Fehlerhaft_Einzelteil_18,  by=c("ID_T18"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft == 1)
+
+Fehl_Komp_nach_Teil_09 <- left_join( Bestend_Kompanente_09, Fehlerhaft_Einzelteil_21,  by=c("ID_T21"="ID"))
+Fehl_Komp_nach_Teil_09 <- left_join( Fehl_Komp_nach_Teil_09, Fehlerhaft_Einzelteil_24,  by=c("ID_T24"="ID"))
+Fehl_Komp_nach_Teil_09 <- left_join( Fehl_Komp_nach_Teil_09, Fehlerhaft_Einzelteil_25,  by=c("ID_T25"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft == 1)
+
+Fehl_Komp_nach_Teil_10 <- left_join( Bestend_Kompanente_10, Fehlerhaft_Einzelteil_21,  by=c("ID_T21"="ID"))
+Fehl_Komp_nach_Teil_10 <- left_join( Fehl_Komp_nach_Teil_10, Fehlerhaft_Einzelteil_24,  by=c("ID_T24"="ID"))
+Fehl_Komp_nach_Teil_10 <- left_join( Fehl_Komp_nach_Teil_10, Fehlerhaft_Einzelteil_27,  by=c("ID_T27"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft == 1)
+
+Fehl_Komp_nach_Teil_11 <- left_join( Bestend_Kompanente_11, Fehlerhaft_Einzelteil_21,  by=c("ID_T21"="ID"))
+Fehl_Komp_nach_Teil_11 <- left_join( Fehl_Komp_nach_Teil_11, Fehlerhaft_Einzelteil_22,  by=c("ID_T22"="ID"))
+Fehl_Komp_nach_Teil_11 <- left_join( Fehl_Komp_nach_Teil_11, Fehlerhaft_Einzelteil_23,  by=c("ID_T23"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft == 1)
+
+Fehl_Komp_nach_Teil_12 <- left_join( Bestend_Kompanente_12, Fehlerhaft_Einzelteil_21,  by=c("ID_T21"="ID"))
+Fehl_Komp_nach_Teil_12 <- left_join( Fehl_Komp_nach_Teil_12, Fehlerhaft_Einzelteil_22,  by=c("ID_T22"="ID"))
+Fehl_Komp_nach_Teil_12 <- left_join( Fehl_Komp_nach_Teil_12, Fehlerhaft_Einzelteil_26,  by=c("ID_T26"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft == 1)
+
+Fehl_Komp_nach_Teil_13 <- left_join( Bestend_Kompanente_13, Fehlerhaft_Einzelteil_30,  by=c("ID_T30"="ID"))
+Fehl_Komp_nach_Teil_13 <- left_join( Fehl_Komp_nach_Teil_13, Fehlerhaft_Einzelteil_31,  by=c("ID_T31"="ID"))
+Fehl_Komp_nach_Teil_13 <- left_join( Fehl_Komp_nach_Teil_13, Fehlerhaft_Einzelteil_32,  by=c("ID_T32"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft == 1)
+
+Fehl_Komp_nach_Teil_14 <- left_join( Bestend_Kompanente_14, Fehlerhaft_Einzelteil_30,  by=c("ID_T30"="ID"))
+Fehl_Komp_nach_Teil_14 <- left_join( Fehl_Komp_nach_Teil_14, Fehlerhaft_Einzelteil_31,  by=c("ID_T31"="ID"))
+Fehl_Komp_nach_Teil_14 <- left_join( Fehl_Komp_nach_Teil_14, Fehlerhaft_Einzelteil_33,  by=c("ID_T33"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft == 1)
+
+Fehl_Komp_nach_Teil_15 <- left_join( Bestend_Kompanente_15, Fehlerhaft_Einzelteil_34,  by=c("ID_T34"="ID"))
+Fehl_Komp_nach_Teil_15 <- left_join( Fehl_Komp_nach_Teil_15, Fehlerhaft_Einzelteil_35,  by=c("ID_T35"="ID"))
+Fehl_Komp_nach_Teil_15 <- left_join( Fehl_Komp_nach_Teil_15, Fehlerhaft_Einzelteil_36,  by=c("ID_T36"="ID"))
+Fehl_Komp_nach_Teil_15 <- left_join( Fehl_Komp_nach_Teil_15, Fehlerhaft_Einzelteil_37,  by=c("ID_T37"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft.x.x == 1| Fehlerhaft.y.y == 1)
+
+Fehl_Komp_nach_Teil_16 <- left_join( Bestend_Kompanente_16, Fehlerhaft_Einzelteil_34,  by=c("ID_T34"="ID"))
+Fehl_Komp_nach_Teil_16 <- left_join( Fehl_Komp_nach_Teil_16, Fehlerhaft_Einzelteil_35,  by=c("ID_T35"="ID"))
+Fehl_Komp_nach_Teil_16 <- left_join( Fehl_Komp_nach_Teil_16, Fehlerhaft_Einzelteil_38,  by=c("ID_T38"="ID"))
+Fehl_Komp_nach_Teil_16 <- left_join( Fehl_Komp_nach_Teil_16, Fehlerhaft_Einzelteil_39,  by=c("ID_T39"="ID"))
+Fehl_Komp_nach_Teil_16 <- left_join( Fehl_Komp_nach_Teil_16, Fehlerhaft_Einzelteil_40,  by=c("ID_T40"="ID")) %>%
+filter(Fehlerhaft.x == 1 | Fehlerhaft.y == 1 | Fehlerhaft.x.x == 1| Fehlerhaft.y.y == 1 | Fehlerhaft == 1)
+
+```
+
+## Für jede Komponententyp (Motor, Sitze, Schaltung, Karosserie) machen wir ein Tebelle mit einer Spalte. Es brauchen wir, um weiter Farzeuge nach Komponenten filtriren, die wegen kapune Teile kaput sind.
+```{r}
+colnames(Fehl_Komp_nach_Teil_01)[6] <- "ID_Motor_Kaput"
+colnames(Fehl_Komp_nach_Teil_02)[6] <- "ID_Motor_Kaput"
+colnames(Fehl_Komp_nach_Teil_03)[6] <- "ID_Motor_Kaput"
+colnames(Fehl_Komp_nach_Teil_04)[6] <- "ID_Motor_Kaput"
+
+colnames(Fehl_Komp_nach_Teil_05)[5] <- "ID_Sitze_Kaput"
+colnames(Fehl_Komp_nach_Teil_06)[5] <- "ID_Sitze_Kaput"
+colnames(Fehl_Komp_nach_Teil_07)[6] <- "ID_Sitze_Kaput"
+colnames(Fehl_Komp_nach_Teil_08)[5] <- "ID_Sitze_Kaput"
+
+colnames(Fehl_Komp_nach_Teil_09)[5] <- "ID_Schaltung_Kaput"
+colnames(Fehl_Komp_nach_Teil_10)[5] <- "ID_Schaltung_Kaput"
+colnames(Fehl_Komp_nach_Teil_11)[5] <- "ID_Schaltung_Kaput"
+colnames(Fehl_Komp_nach_Teil_12)[5] <- "ID_Schaltung_Kaput"
+
+colnames(Fehl_Komp_nach_Teil_13)[5] <- "ID_Karosserie_Kaput"
+colnames(Fehl_Komp_nach_Teil_14)[5] <- "ID_Karosserie_Kaput"
+colnames(Fehl_Komp_nach_Teil_15)[6] <- "ID_Karosserie_Kaput"
+colnames(Fehl_Komp_nach_Teil_16)[7] <- "ID_Karosserie_Kaput"
+
+Koputen_Motoren_nach_Teil <- bind_rows( Fehl_Komp_nach_Teil_01[6], Fehl_Komp_nach_Teil_02[6], Fehl_Komp_nach_Teil_03[6], Fehl_Komp_nach_Teil_04[6])
+
+Koputen_Sitze_nach_Teil <- bind_rows( Fehl_Komp_nach_Teil_05[5], Fehl_Komp_nach_Teil_06[5], Fehl_Komp_nach_Teil_07[6], Fehl_Komp_nach_Teil_08[5])
+
+Koputen_Schaltung_nach_Teil <- bind_rows( Fehl_Komp_nach_Teil_09[5], Fehl_Komp_nach_Teil_10[5], Fehl_Komp_nach_Teil_11[5], Fehl_Komp_nach_Teil_12[5])
+
+Koputen_Karosseri_nach_Teil <- bind_rows( Fehl_Komp_nach_Teil_13[5], Fehl_Komp_nach_Teil_14[5], Fehl_Komp_nach_Teil_15[6], Fehl_Komp_nach_Teil_16[7])
+
+```
+
+## Filtriren Ferzeuge nach 2013-2015 Produktionsyear
+```{r}
+Fz1 <- function(X){
+  X <- X[3:9]%>%
+  separate(2,into = c("Year", "Month", "Day"), sep = "-")%>%
+  filter(Year == 2013 | Year == 2014 | Year == 2015) %>%
+  unite(Produktionsdatum, Year, Month, Day, sep = "-")
+  return(X)
+}
+
+Fahrzeuge_01_2013_2015 <- Fz1(Fahrzeuge_01)
+Fahrzeuge_02_2013_2015 <- Fz1(Fahrzeuge_02)
+
+Fz2 <- function(X){
+  X$Produktionsdatum_Origin_01011970 <- as.Date(X$Produktionsdatum_Origin_01011970, "1970-01-01")
+  X <- X[3:9]%>%
+  separate(7,into = c("Year", "Month", "Day"), sep = "-") %>%
+  filter(Year == 2013 | Year == 2014 | Year == 2015) %>%
+  unite(Produktionsdatum, Year, Month, Day, sep = "-")
+  return(X)
+}
+
+Fahrzeuge_03_2013_2015 <- Fz2(Fahrzeuge_03)
+Fahrzeuge_04_2013_2015 <- Fz2(Fahrzeuge_04)
+
+```
+
+## Filtriren alle Bestend Fahrzeuge nach Komponenten mit kaputen Teilen. Danach feltriren wir in welchen Autos (2013-2015) stehit Komponenten mit kaputen Teilen
+```{r}
+
+Fehl_Fahrzeuge_nach_Teil_01_Motor <- inner_join( Bestend_Fahrzeuge_01, Koputen_Motoren_nach_Teil, by=c("ID_Motor"="ID_Motor_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_01_Sitze <- inner_join( Bestend_Fahrzeuge_01, Koputen_Sitze_nach_Teil, by=c("ID_Sitze"="ID_Sitze_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_01_Schaltung <- inner_join( Bestend_Fahrzeuge_01, Koputen_Schaltung_nach_Teil, by=c("ID_Schaltung"="ID_Schaltung_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_01_Karosserie <- inner_join( Bestend_Fahrzeuge_01, Koputen_Karosseri_nach_Teil, by=c("ID_Karosserie"="ID_Karosserie_Kaput"))
+
+Final_Komp_Farz_nach_Teile_01 <- bind_rows( Fehl_Fahrzeuge_nach_Teil_01_Motor, Fehl_Fahrzeuge_nach_Teil_01_Sitze, Fehl_Fahrzeuge_nach_Teil_01_Schaltung, Fehl_Fahrzeuge_nach_Teil_01_Karosserie)
+
+Final_Komp_Farz_nach_Teile_01 <- distinct(Final_Komp_Farz_nach_Teile_01)
+
+
+Fehl_Fahrzeuge_nach_Teil_02_Motor <- inner_join( Bestend_Fahrzeuge_02, Koputen_Motoren_nach_Teil, by=c("ID_Motor"="ID_Motor_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_02_Sitze <- inner_join( Bestend_Fahrzeuge_02, Koputen_Sitze_nach_Teil, by=c("ID_Sitze"="ID_Sitze_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_02_Schaltung <- inner_join( Bestend_Fahrzeuge_02, Koputen_Schaltung_nach_Teil, by=c("ID_Schaltung"="ID_Schaltung_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_02_Karosserie <- inner_join( Bestend_Fahrzeuge_02, Koputen_Karosseri_nach_Teil, by=c("ID_Karosserie"="ID_Karosserie_Kaput"))
+
+Final_Komp_Farz_nach_Teile_02 <- bind_rows( Fehl_Fahrzeuge_nach_Teil_02_Motor, Fehl_Fahrzeuge_nach_Teil_02_Sitze, Fehl_Fahrzeuge_nach_Teil_02_Schaltung, Fehl_Fahrzeuge_nach_Teil_02_Karosserie)
+
+Final_Komp_Farz_nach_Teile_02 <- distinct(Final_Komp_Farz_nach_Teile_02)
+
+Kap_FZnTEIL_OEM1_1 <- inner_join( Fahrzeuge_01_2013_2015, Final_Komp_Farz_nach_Teile_01, by="ID_Fahrzeug")
+Kap_FZnTEIL_OEM1_2 <- inner_join( Fahrzeuge_02_2013_2015, Final_Komp_Farz_nach_Teile_02, by="ID_Fahrzeug")
+
+Kap_FZnTEIL_OEM1 <- bind_rows( Kap_FZnTEIL_OEM1_1, Kap_FZnTEIL_OEM1_2)
+
+
+
+
+Fehl_Fahrzeuge_nach_Teil_03_Motor <- inner_join( Bestend_Fahrzeuge_03, Koputen_Motoren_nach_Teil, by=c("ID_Motor"="ID_Motor_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_03_Sitze <- inner_join( Bestend_Fahrzeuge_03, Koputen_Sitze_nach_Teil, by=c("ID_Sitze"="ID_Sitze_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_03_Schaltung <- inner_join( Bestend_Fahrzeuge_03, Koputen_Schaltung_nach_Teil, by=c("ID_Schaltung"="ID_Schaltung_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_03_Karosserie <- inner_join( Bestend_Fahrzeuge_03, Koputen_Karosseri_nach_Teil, by=c("ID_Karosserie"="ID_Karosserie_Kaput"))
+
+Final_Komp_Farz_nach_Teile_03 <- bind_rows( Fehl_Fahrzeuge_nach_Teil_03_Motor, Fehl_Fahrzeuge_nach_Teil_03_Sitze, Fehl_Fahrzeuge_nach_Teil_03_Schaltung, Fehl_Fahrzeuge_nach_Teil_03_Karosserie)
+
+Final_Komp_Farz_nach_Teile_03 <- distinct(Final_Komp_Farz_nach_Teile_03)
+
+
+Fehl_Fahrzeuge_nach_Teil_04_Motor <- inner_join( Bestend_Fahrzeuge_04, Koputen_Motoren_nach_Teil, by=c("ID_Motor"="ID_Motor_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_04_Sitze <- inner_join( Bestend_Fahrzeuge_04, Koputen_Sitze_nach_Teil, by=c("ID_Sitze"="ID_Sitze_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_04_Schaltung <- inner_join( Bestend_Fahrzeuge_04, Koputen_Schaltung_nach_Teil, by=c("ID_Schaltung"="ID_Schaltung_Kaput"))
+
+Fehl_Fahrzeuge_nach_Teil_04_Karosserie <- inner_join( Bestend_Fahrzeuge_04, Koputen_Karosseri_nach_Teil, by=c("ID_Karosserie"="ID_Karosserie_Kaput"))
+
+Final_Komp_Farz_nach_Teile_04 <- bind_rows( Fehl_Fahrzeuge_nach_Teil_04_Motor, Fehl_Fahrzeuge_nach_Teil_04_Sitze, Fehl_Fahrzeuge_nach_Teil_04_Schaltung, Fehl_Fahrzeuge_nach_Teil_04_Karosserie)
+
+Final_Komp_Farz_nach_Teile_04 <- distinct(Final_Komp_Farz_nach_Teile_04)
+
+Kap_FZnTEIL_OEM2_1 <- inner_join( Fahrzeuge_03_2013_2015, Final_Komp_Farz_nach_Teile_03, by="ID_Fahrzeug")
+Kap_FZnTEIL_OEM2_2 <- inner_join( Fahrzeuge_04_2013_2015, Final_Komp_Farz_nach_Teile_04, by="ID_Fahrzeug")
+
+Kap_FZnTEIL_OEM2 <- bind_rows( Kap_FZnTEIL_OEM2_1, Kap_FZnTEIL_OEM2_2)
+
+```
+
+
+#############################################################################################################################
+
+## Übernemen nur richtigen Spalten aus der Kompnenten Tabelen + filtriren nach Fehlerhaft == 1
+## Bekommen alle Komponenten, die kaput sind.
+```{r}
+Fehlerhaft_Komponenten_01 <- select(Kompanente_01, ID_Motor, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Komponenten_02 <- select(Kompanente_02, ID_Motor, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Komponenten_03 <- select(Kompanente_03, ID_Motor.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Komponenten_04 <- select(Kompanente_04, "K1DI2-103-1031-2", "103", "1031", "0", "X7", "0_1") 
+Fehlerhaft_Komponenten_04 <- Fehlerhaft_Komponenten_04[Fehlerhaft_Komponenten_04$"0" %in% c(1), ]
+
+Fehlerhaft_Komponenten_05 <- select(Kompanente_05, "K2LE1-109-1091-2", "109", "1091", "1_2", "2010-10-18", "37080") 
+Fehlerhaft_Komponenten_05 <- Fehlerhaft_Komponenten_05[Fehlerhaft_Komponenten_05$"1_2" %in% c(1), ]
+
+Fehlerhaft_Komponenten_06 <- select(Kompanente_06, ID_Sitze, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Komponenten_07 <- select(Kompanente_07, ID_Sitze, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Komponenten_08 <- select(Kompanente_08, ID_Sitze, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Komponenten_09 <- select(Kompanente_09, ID_Schaltung.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Komponenten_10 <- select(Kompanente_10, ID_Schaltung, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Komponenten_11 <- select(Kompanente_11, ID_Schaltung.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Komponenten_12 <- select(Kompanente_12, ID_Schaltung, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Komponenten_13 <- select(Kompanente_13, ID_Karosserie.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Komponenten_14 <- select(Kompanente_14, ID_Karosserie.x, Herstellernummer.x, Werksnummer.x, Fehlerhaft.x, Fehlerhaft_Datum.x, Fehlerhaft_Fahrleistung.x) %>%
+filter(Fehlerhaft.x == 1)
+
+Fehlerhaft_Komponenten_15 <- select(Kompanente_15, ID_Karosserie, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+
+Fehlerhaft_Komponenten_16 <- select(Kompanente_16, ID_Karosserie, Herstellernummer, Werksnummer, Fehlerhaft, Fehlerhaft_Datum, Fehlerhaft_Fahrleistung) %>%
+filter(Fehlerhaft == 1)
+```
+
+## Geben gleiche Spaltenname für alle kapute Einzelteil. Damit wir später die Tabellen addiren können.
+```{r}
+
+colnames(Fehlerhaft_Komponenten_01) <- c("ID_Motor_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_02) <- c("ID_Motor_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_03) <- c("ID_Motor_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_04) <- c("ID_Motor_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_05) <- c("ID_Sitze_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_06) <- c("ID_Sitze_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_07) <- c("ID_Sitze_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_08) <- c("ID_Sitze_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_09) <- c("ID_Schaltung_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_10) <- c("ID_Schaltung_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_11) <- c("ID_Schaltung_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_12) <- c("ID_Schaltung_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_13) <- c("ID_Karosserie_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_14) <- c("ID_Karosserie_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_15) <- c("ID_Karosserie_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+colnames(Fehlerhaft_Komponenten_16) <- c("ID_Karosserie_Kaput","Herstellernummer","Werksnummer","Fehlerhaft","Fehlerhaft_Datum","Fehlerhaft_Fahrleistung")
+```
+
+## Für jede Komponententyp (Motor, Sitze, Schaltung, Karosserie) machen wir ein Tebelle mit einer Spalte. Es brauchen wir, um weiter Farzeuge nach kaputen Komponenten filtriren.
+```{r}
+
+Koputen_Motoren_nach_Komp <- bind_rows( Fehlerhaft_Komponenten_01[1], Fehlerhaft_Komponenten_02[1], Fehlerhaft_Komponenten_03[1], Fehlerhaft_Komponenten_04[1])
+
+Koputen_Sitzen_nach_Komp <- bind_rows( Fehlerhaft_Komponenten_05[1], Fehlerhaft_Komponenten_06[1], Fehlerhaft_Komponenten_07[1], Fehlerhaft_Komponenten_08[1])
+
+Koputen_Schaltung_nach_Komp <- bind_rows( Fehlerhaft_Komponenten_09[1], Fehlerhaft_Komponenten_10[1], Fehlerhaft_Komponenten_11[1], Fehlerhaft_Komponenten_12[1])
+
+Koputen_Karosserie_nach_Komp <- bind_rows( Fehlerhaft_Komponenten_13[1], Fehlerhaft_Komponenten_14[1], Fehlerhaft_Komponenten_15[1], Fehlerhaft_Komponenten_16[1])
+
+```
+
+## 
+```{r}
+
+Fehl_Fahrzeuge_nach_Komp_01_Motor <- inner_join( Bestend_Fahrzeuge_01, Koputen_Motoren_nach_Komp, by=c("ID_Motor"="ID_Motor_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_01_Sitze <- inner_join( Bestend_Fahrzeuge_01, Koputen_Sitzen_nach_Komp, by=c("ID_Sitze"="ID_Sitze_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_01_Schaltung <- inner_join( Bestend_Fahrzeuge_01, Koputen_Schaltung_nach_Komp, by=c("ID_Schaltung"="ID_Schaltung_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_01_Karosserie <- inner_join( Bestend_Fahrzeuge_01, Koputen_Karosserie_nach_Komp, by=c("ID_Karosserie"="ID_Karosserie_Kaput"))
+
+Final_Komp_Farz_01 <- bind_rows( Fehl_Fahrzeuge_nach_Komp_01_Motor, Fehl_Fahrzeuge_nach_Komp_01_Sitze, Fehl_Fahrzeuge_nach_Komp_01_Schaltung, Fehl_Fahrzeuge_nach_Komp_01_Karosserie)
+
+Final_Komp_Farz_01 <- distinct(Final_Komp_Farz_01)
+
+
+
+Fehl_Fahrzeuge_nach_Komp_02_Motor <- inner_join( Bestend_Fahrzeuge_02, Koputen_Motoren_nach_Komp, by=c("ID_Motor"="ID_Motor_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_02_Sitze <- inner_join( Bestend_Fahrzeuge_02, Koputen_Sitzen_nach_Komp, by=c("ID_Sitze"="ID_Sitze_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_02_Schaltung <- inner_join( Bestend_Fahrzeuge_02, Koputen_Schaltung_nach_Komp, by=c("ID_Schaltung"="ID_Schaltung_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_02_Karosserie <- inner_join( Bestend_Fahrzeuge_02, Koputen_Karosserie_nach_Komp, by=c("ID_Karosserie"="ID_Karosserie_Kaput"))
+
+Final_Komp_Farz_02 <- bind_rows( Fehl_Fahrzeuge_nach_Komp_02_Motor, Fehl_Fahrzeuge_nach_Komp_02_Sitze, Fehl_Fahrzeuge_nach_Komp_02_Schaltung, Fehl_Fahrzeuge_nach_Komp_02_Karosserie)
+
+Final_Komp_Farz_02 <- distinct(Final_Komp_Farz_02)
+
+
+Fehl_Fahrzeuge_nach_Komp_03_Motor <- inner_join( Bestend_Fahrzeuge_03, Koputen_Motoren_nach_Komp, by=c("ID_Motor"="ID_Motor_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_03_Sitze <- inner_join( Bestend_Fahrzeuge_03, Koputen_Sitzen_nach_Komp, by=c("ID_Sitze"="ID_Sitze_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_03_Schaltung <- inner_join( Bestend_Fahrzeuge_03, Koputen_Schaltung_nach_Komp, by=c("ID_Schaltung"="ID_Schaltung_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_03_Karosserie <- inner_join( Bestend_Fahrzeuge_03, Koputen_Karosserie_nach_Komp, by=c("ID_Karosserie"="ID_Karosserie_Kaput"))
+
+Final_Komp_Farz_03 <- bind_rows( Fehl_Fahrzeuge_nach_Komp_03_Motor, Fehl_Fahrzeuge_nach_Komp_03_Sitze, Fehl_Fahrzeuge_nach_Komp_03_Schaltung, Fehl_Fahrzeuge_nach_Komp_03_Karosserie)
+
+Final_Komp_Farz_03 <- distinct(Final_Komp_Farz_03)
+
+
+
+Fehl_Fahrzeuge_nach_Komp_04_Motor <- inner_join( Bestend_Fahrzeuge_04, Koputen_Motoren_nach_Komp, by=c("ID_Motor"="ID_Motor_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_04_Sitze <- inner_join( Bestend_Fahrzeuge_04, Koputen_Sitzen_nach_Komp, by=c("ID_Sitze"="ID_Sitze_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_04_Schaltung <- inner_join( Bestend_Fahrzeuge_04, Koputen_Schaltung_nach_Komp, by=c("ID_Schaltung"="ID_Schaltung_Kaput"))
+
+Fehl_Fahrzeuge_nach_Komp_04_Karosserie <- inner_join( Bestend_Fahrzeuge_04, Koputen_Karosserie_nach_Komp, by=c("ID_Karosserie"="ID_Karosserie_Kaput"))
+
+Final_Komp_Farz_04 <- bind_rows( Fehl_Fahrzeuge_nach_Komp_04_Motor, Fehl_Fahrzeuge_nach_Komp_04_Sitze, Fehl_Fahrzeuge_nach_Komp_04_Schaltung, Fehl_Fahrzeuge_nach_Komp_04_Karosserie)
+
+Final_Komp_Farz_04 <- distinct(Final_Komp_Farz_04)
+```
+
+## Filtriren kaputen Komponenten nach Farzeugen (2013-2015)
+```{r}
+
+Kap_FZnKOMP_OEM1_1 <- inner_join( Fahrzeuge_01_2013_2015, Final_Komp_Farz_01, by="ID_Fahrzeug")
+Kap_FZnKOMP_OEM1_2 <- inner_join( Fahrzeuge_02_2013_2015, Final_Komp_Farz_02, by="ID_Fahrzeug")
+
+Kap_FZnKOMP_OEM1 <- bind_rows( Kap_FZnKOMP_OEM1_1, Kap_FZnKOMP_OEM1_2)
+
+Kap_FZnKOMP_OEM2_1 <- inner_join( Fahrzeuge_03_2013_2015, Final_Komp_Farz_03, by="ID_Fahrzeug")
+Kap_FZnKOMP_OEM2_2 <- inner_join( Fahrzeuge_04_2013_2015, Final_Komp_Farz_04, by="ID_Fahrzeug")
+
+Kap_FZnKOMP_OEM2 <- bind_rows( Kap_FZnKOMP_OEM2_1, Kap_FZnKOMP_OEM2_2)
+
+```
+
+##############################################################################################################################
+
+## Filtriten kaputes Autos Produktionsyahr 2013-2015 nahc fehlerhaft == 1
+```{r}
+Fianal_kapute_Farzeuge_nach_Farzeuge_01 <- filter (Fahrzeuge_01_2013_2015, Fehlerhaft == 1)
+Fianal_kapute_Farzeuge_nach_Farzeuge_02 <- filter (Fahrzeuge_02_2013_2015, Fehlerhaft == 1)
+Fianal_kapute_Farzeuge_nach_Farzeuge_03 <- filter (Fahrzeuge_03_2013_2015, Fehlerhaft == 1)
+Fianal_kapute_Farzeuge_nach_Farzeuge_04 <- filter (Fahrzeuge_04_2013_2015, Fehlerhaft == 1)
+
+Kap_FZnFZ_OEM1 <- bind_rows( Fianal_kapute_Farzeuge_nach_Farzeuge_01, Fianal_kapute_Farzeuge_nach_Farzeuge_02)
+Kap_FZnFZ_OEM2 <- bind_rows( Fianal_kapute_Farzeuge_nach_Farzeuge_03, Fianal_kapute_Farzeuge_nach_Farzeuge_04)
+```
+
+```{r}
+rm(Bestend_Fahrzeuge_01, Bestend_Fahrzeuge_02, Bestend_Fahrzeuge_03, Bestend_Fahrzeuge_04, Bestend_Kompanente_01, Bestend_Kompanente_02, Bestend_Kompanente_03, Bestend_Kompanente_04, Bestend_Kompanente_05, Bestend_Kompanente_06, Bestend_Kompanente_07, Bestend_Kompanente_08, Bestend_Kompanente_09, Bestend_Kompanente_10, Bestend_Kompanente_11, Bestend_Kompanente_12, Bestend_Kompanente_13, Bestend_Kompanente_14, Bestend_Kompanente_15, Bestend_Kompanente_16)
+
+rm(Einzelteil_01, Einzelteil_02, Einzelteil_03, Einzelteil_04, Einzelteil_05, Einzelteil_06, Einzelteil_07, Einzelteil_08, Einzelteil_09, Einzelteil_10, Einzelteil_11, Einzelteil_12, Einzelteil_13, Einzelteil_14, Einzelteil_15, Einzelteil_16, Einzelteil_17, Einzelteil_18, Einzelteil_19, Einzelteil_20, Einzelteil_21, Einzelteil_22, Einzelteil_23, Einzelteil_24, Einzelteil_25, Einzelteil_26, Einzelteil_27, Einzelteil_30, Einzelteil_31, Einzelteil_32, Einzelteil_33, Einzelteil_34, Einzelteil_35, Einzelteil_36, Einzelteil_37, Einzelteil_38, Einzelteil_39, Einzelteil_40)
+
+rm(Fahrzeuge_01, Fahrzeuge_02, Fahrzeuge_03, Fahrzeuge_04, Fahrzeuge_01_2013_2015, Fahrzeuge_02_2013_2015, Fahrzeuge_03_2013_2015, Fahrzeuge_04_2013_2015)
+
+rm(Fehl_Fahrzeuge_nach_Komp_01_Karosserie, Fehl_Fahrzeuge_nach_Komp_01_Motor, Fehl_Fahrzeuge_nach_Komp_01_Schaltung, Fehl_Fahrzeuge_nach_Komp_01_Sitze, Fehl_Fahrzeuge_nach_Komp_02_Karosserie, Fehl_Fahrzeuge_nach_Komp_02_Motor, Fehl_Fahrzeuge_nach_Komp_02_Schaltung, Fehl_Fahrzeuge_nach_Komp_02_Sitze, Fehl_Fahrzeuge_nach_Komp_03_Karosserie, Fehl_Fahrzeuge_nach_Komp_03_Motor, Fehl_Fahrzeuge_nach_Komp_03_Schaltung, Fehl_Fahrzeuge_nach_Komp_03_Sitze, Fehl_Fahrzeuge_nach_Komp_04_Karosserie, Fehl_Fahrzeuge_nach_Komp_04_Motor, Fehl_Fahrzeuge_nach_Komp_04_Schaltung, Fehl_Fahrzeuge_nach_Komp_04_Sitze)
+
+rm(Fehl_Fahrzeuge_nach_Teil_01_Karosserie, Fehl_Fahrzeuge_nach_Teil_01_Motor, Fehl_Fahrzeuge_nach_Teil_01_Schaltung, Fehl_Fahrzeuge_nach_Teil_01_Sitze, Fehl_Fahrzeuge_nach_Teil_02_Karosserie, Fehl_Fahrzeuge_nach_Teil_02_Motor, Fehl_Fahrzeuge_nach_Teil_02_Schaltung, Fehl_Fahrzeuge_nach_Teil_02_Sitze, Fehl_Fahrzeuge_nach_Teil_03_Karosserie, Fehl_Fahrzeuge_nach_Teil_03_Motor, Fehl_Fahrzeuge_nach_Teil_03_Schaltung, Fehl_Fahrzeuge_nach_Teil_03_Sitze, Fehl_Fahrzeuge_nach_Teil_04_Karosserie, Fehl_Fahrzeuge_nach_Teil_04_Motor, Fehl_Fahrzeuge_nach_Teil_04_Schaltung, Fehl_Fahrzeuge_nach_Teil_04_Sitze)
+
+rm(Fehl_Komp_nach_Teil_01, Fehl_Komp_nach_Teil_02, Fehl_Komp_nach_Teil_03, Fehl_Komp_nach_Teil_04, Fehl_Komp_nach_Teil_05, Fehl_Komp_nach_Teil_06, Fehl_Komp_nach_Teil_07, Fehl_Komp_nach_Teil_08, Fehl_Komp_nach_Teil_09, Fehl_Komp_nach_Teil_10, Fehl_Komp_nach_Teil_11, Fehl_Komp_nach_Teil_12, Fehl_Komp_nach_Teil_13, Fehl_Komp_nach_Teil_14, Fehl_Komp_nach_Teil_15, Fehl_Komp_nach_Teil_16)
+
+rm(Fehlerhaft_Einzelteil_01, Fehlerhaft_Einzelteil_02, Fehlerhaft_Einzelteil_03, Fehlerhaft_Einzelteil_04, Fehlerhaft_Einzelteil_05, Fehlerhaft_Einzelteil_06, Fehlerhaft_Einzelteil_07, Fehlerhaft_Einzelteil_08, Fehlerhaft_Einzelteil_09, Fehlerhaft_Einzelteil_10, Fehlerhaft_Einzelteil_11, Fehlerhaft_Einzelteil_12, Fehlerhaft_Einzelteil_13, Fehlerhaft_Einzelteil_14, Fehlerhaft_Einzelteil_15, Fehlerhaft_Einzelteil_16, Fehlerhaft_Einzelteil_17, Fehlerhaft_Einzelteil_18, Fehlerhaft_Einzelteil_19, Fehlerhaft_Einzelteil_20, Fehlerhaft_Einzelteil_21, Fehlerhaft_Einzelteil_22, Fehlerhaft_Einzelteil_23, Fehlerhaft_Einzelteil_24, Fehlerhaft_Einzelteil_25, Fehlerhaft_Einzelteil_26, Fehlerhaft_Einzelteil_27, Fehlerhaft_Einzelteil_30, Fehlerhaft_Einzelteil_31, Fehlerhaft_Einzelteil_32, Fehlerhaft_Einzelteil_33, Fehlerhaft_Einzelteil_34, Fehlerhaft_Einzelteil_35, Fehlerhaft_Einzelteil_36, Fehlerhaft_Einzelteil_37, Fehlerhaft_Einzelteil_38, Fehlerhaft_Einzelteil_39, Fehlerhaft_Einzelteil_40)
+
+rm(Fehlerhaft_Komponenten_01, Fehlerhaft_Komponenten_02, Fehlerhaft_Komponenten_03, Fehlerhaft_Komponenten_04, Fehlerhaft_Komponenten_05, Fehlerhaft_Komponenten_06, Fehlerhaft_Komponenten_07, Fehlerhaft_Komponenten_08, Fehlerhaft_Komponenten_09, Fehlerhaft_Komponenten_10, Fehlerhaft_Komponenten_11, Fehlerhaft_Komponenten_12, Fehlerhaft_Komponenten_13, Fehlerhaft_Komponenten_14, Fehlerhaft_Komponenten_15, Fehlerhaft_Komponenten_16) 
+
+rm(Kompanente_01, Kompanente_02, Kompanente_03, Kompanente_04, Kompanente_05, Kompanente_06, Kompanente_07, Kompanente_08, Kompanente_09, Kompanente_10, Kompanente_11, Kompanente_12, Kompanente_13, Kompanente_14, Kompanente_15, Kompanente_16)
+
+rm(Final_Komp_Farz_01, Final_Komp_Farz_02, Final_Komp_Farz_03, Final_Komp_Farz_04, Final_Komp_Farz_nach_Teile_01, Final_Komp_Farz_nach_Teile_02, Final_Komp_Farz_nach_Teile_03, Final_Komp_Farz_nach_Teile_04, Fianal_kapute_Farzeuge_nach_Farzeuge_01, Fianal_kapute_Farzeuge_nach_Farzeuge_02, Fianal_kapute_Farzeuge_nach_Farzeuge_03, Fianal_kapute_Farzeuge_nach_Farzeuge_04)
+
+rm(Koputen_Karosseri_nach_Teil, Koputen_Karosserie_nach_Komp, Koputen_Motoren_nach_Komp, Koputen_Motoren_nach_Teil, Koputen_Schaltung_nach_Komp, Koputen_Schaltung_nach_Teil, Koputen_Sitze_nach_Teil, Koputen_Sitzen_nach_Komp)
+
+rm(Kap_FZnKOMP_OEM1_1, Kap_FZnKOMP_OEM1_2, Kap_FZnKOMP_OEM2_1, Kap_FZnKOMP_OEM2_2, Kap_FZnTEIL_OEM1_1, Kap_FZnTEIL_OEM1_2, Kap_FZnTEIL_OEM2_1, Kap_FZnTEIL_OEM2_2)
+
+rm(ET_01, ET_02, ET_03, ET_07, ET_09, ET_11, ET_16, ET_20, ET_22, ET_24, ET_27, ET_31, ET_34, ET_35, ET_36, ET_39, k20, k21, Einzelteil, Einzelteil_path, Fahrzeug, Fahrzeug_path, Komponente, Komponente_path, Fz1, Fz2)
+```
+
+
+
+```{r}
+Final_Kap_FZnFZ_OEM1  <- select(Kap_FZnFZ_OEM1, ID_Fahrzeug, Werksnummer, Produktionsdatum) %>%
+  separate("Produktionsdatum", into = c("Year", "Month", "Day"), sep = "-")  %>%
+  select(ID_Fahrzeug, Werksnummer, Year)
+  
+
+Final_Kap_FZnFZ_OEM2  <- select(Kap_FZnFZ_OEM2, ID_Fahrzeug, Werksnummer, Produktionsdatum) %>%
+  separate("Produktionsdatum", into = c("Year", "Month", "Day"), sep = "-")  %>%
+  select(ID_Fahrzeug, Werksnummer, Year)
+
+
+Final_Kap_FZnKOMP_OEM1  <- select(Kap_FZnKOMP_OEM1, ID_Fahrzeug, Werksnummer, Produktionsdatum) %>%
+  separate("Produktionsdatum", into = c("Year", "Month", "Day"), sep = "-")  %>%
+  select(ID_Fahrzeug, Werksnummer, Year)
+
+
+Final_Kap_FZnKOMP_OEM2  <- select(Kap_FZnKOMP_OEM2, ID_Fahrzeug, Werksnummer, Produktionsdatum) %>%
+  separate("Produktionsdatum", into = c("Year", "Month", "Day"), sep = "-")  %>%
+  select(ID_Fahrzeug, Werksnummer, Year)
+
+
+Final_Kap_FZnTEIL_OEM1  <- select(Kap_FZnTEIL_OEM1, ID_Fahrzeug, Werksnummer, Produktionsdatum) %>%
+  separate("Produktionsdatum", into = c("Year", "Month", "Day"), sep = "-")  %>%
+  select(ID_Fahrzeug, Werksnummer, Year)
+
+
+Final_Kap_FZnTEIL_OEM2  <- select(Kap_FZnTEIL_OEM2, ID_Fahrzeug, Werksnummer, Produktionsdatum) %>%
+  separate("Produktionsdatum", into = c("Year", "Month", "Day"), sep = "-")  %>%
+  select(ID_Fahrzeug, Werksnummer, Year)
+```
+
+
+```{r}
+Teile_1_und_2 <- bind_rows(Final_Kap_FZnTEIL_OEM1, Final_Kap_FZnTEIL_OEM2)
+Komp_1_und_2 <- bind_rows(Final_Kap_FZnKOMP_OEM1, Final_Kap_FZnKOMP_OEM2)
+Fz_1_und_2 <- bind_rows(Final_Kap_FZnFZ_OEM1, Final_Kap_FZnFZ_OEM2)
+
+Tabl_Komp_ohne_Teile <- setdiff(Komp_1_und_2, Teile_1_und_2)
+Tabl_Fz_ohne_Komp_und_Teile <- setdiff(Fz_1_und_2, Komp_1_und_2) %>%
+  setdiff(Teile_1_und_2)
+```
+
+```{r}
+Tabl_Komp_ohne_Teile <- mutate(Tabl_Komp_ohne_Teile, Kaput_wegen = "T")
+Teile_1_und_2 <- mutate(Teile_1_und_2, Kaput_wegen = "K")
+Tabl_Tabl_Fz_ohne_Komp_und_Teile <- mutate(Tabl_Fz_ohne_Komp_und_Teile, Kaput_wegen = "F")
+
+Final_Gesmt <- bind_rows(Tabl_Komp_ohne_Teile, Tabl_Fz_ohne_Komp_und_Teile, Teile_1_und_2) %>%
+  select(Werksnummer, Year, Kaput_wegen)
+```
+
+```{r}
+rm(list=(ls()[ls()!="Final_Gesmt"]))
+```
+
+```{r}
+save("Final_Gesmt", file = "Final_Finaler_Datensatz_21.RData")
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+# sum up all the defective cars on each level
+Total_Kap_FZ_OEM1 <- bind_rows(Kap_FZnFZ_OEM1, Kap_FZnKOMP_OEM1, Kap_FZnTEIL_OEM1)
+
+Total_Kap_FZ_OEM2 <- bind_rows(Kap_FZnFZ_OEM2, Kap_FZnKOMP_OEM2, Kap_FZnTEIL_OEM2)
+
+Unique_Kap_FZ_OEM1 <- Total_Kap_FZ_OEM1[!duplicated(Total_Kap_FZ_OEM1$ID_Fahrzeug), ]
+
+Unique_Kap_FZ_OEM2 <- Total_Kap_FZ_OEM2[!duplicated(Total_Kap_FZ_OEM2$ID_Fahrzeug), ]
+
+# convert full dates to just years, we dont care about month and day
+Unique_Kap_FZ_OEM1$Produktionsdatum <- format(as.Date(Unique_Kap_FZ_OEM1$Produktionsdatum, format="%Y-%m-%d"),"%Y")
+Unique_Kap_FZ_OEM2$Produktionsdatum <- format(as.Date(Unique_Kap_FZ_OEM2$Produktionsdatum, format="%Y-%m-%d"),"%Y")
+
+
+# count  number of defective cars for each year
+Kap_FZ_2013_OEM1 <- sum(Unique_Kap_FZ_OEM1$Produktionsdatum=="2013")
+Kap_FZ_2014_OEM1 <- sum(Unique_Kap_FZ_OEM1$Produktionsdatum=="2014")
+Kap_FZ_2015_OEM1 <- sum(Unique_Kap_FZ_OEM1$Produktionsdatum=="2015")
+
+Kap_FZ_2013_OEM2 <- sum(Unique_Kap_FZ_OEM2$Produktionsdatum=="2013")
+Kap_FZ_2014_OEM2 <- sum(Unique_Kap_FZ_OEM2$Produktionsdatum=="2014")
+Kap_FZ_2015_OEM2 <- sum(Unique_Kap_FZ_OEM2$Produktionsdatum=="2015")
+
+#Years <- c("2013", "2014", "2015")
+
+OEM1_data <- data.frame(
+  Years=c("2013", "2014", "2015"),   
+  values=c(Kap_FZ_2013_OEM1,Kap_FZ_2014_OEM1,Kap_FZ_2015_OEM1)
+)
+
+ggplot(OEM1_data, aes(x=Years, y=values)) + 
+  geom_bar(stat = "identity")
+
+
+OEM2_data <- data.frame(
+  Years=c("2013", "2014", "2015"),   
+  values=c(Kap_FZ_2013_OEM2,Kap_FZ_2014_OEM2,Kap_FZ_2015_OEM2)
+)
+
+ggplot(OEM2_data, aes(x=Years, y=values)) + 
+  geom_bar(stat = "identity")  
+```
+
+
+
+
